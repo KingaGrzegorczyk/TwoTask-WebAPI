@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TwoTaskLibrary.DataAccess;
+using TwoTaskLibrary.Application;
+using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 
 namespace TwoTaskWebAPI.Controllers
@@ -9,50 +10,56 @@ namespace TwoTaskWebAPI.Controllers
     [ApiController]
     public class TodoTasksController : ControllerBase
     {
+        private readonly SqlDataAccess _sql;
+        private readonly TodoTaskRepository _data;
+
+        public TodoTasksController()
+        {
+            _sql = new SqlDataAccess();
+            _data = new TodoTaskRepository(_sql);
+        }
+
         [HttpPost]
         public IActionResult Post([FromBody] TodoTaskModel todoTask)
         {
-            TodoTaskData data = new TodoTaskData();
-
-            data.SaveTodoTask(todoTask);
+            _data.SaveTodoTask(todoTask);
 
             return Ok();
         }
 
         [HttpGet]
-        public List<TodoTaskModel> Get()
+        public IActionResult Get()
         {
-            TodoTaskData data = new TodoTaskData();
-
-            return data.GetAllTodoTasks();
+            return Ok(_data.GetAllTodoTasks());
         }
 
         [HttpGet("{taskId}")]
-        public TodoTaskModel Get(int taskId)
+        public IActionResult Get(int taskId)
         {
-            TodoTaskData data = new TodoTaskData();
-
-            return data.GetTodoTaskById(taskId);
+            return Ok(_data.GetTodoTaskById(taskId));
         }
 
         [HttpPut("{taskId}")]
         public IActionResult Put(int taskId, [FromBody] TodoTaskModel todoTask)
         {
-            TodoTaskData data = new TodoTaskData();
+            try
+            {
+                _data.UpdateTodoTaskById(taskId, todoTask);
+                return Ok();
+            }
+            catch(Exception)
+            {
+                return NoContent();
+            }
 
-            data.UpdateTodoTaskById(taskId, todoTask);
-
-            return Ok();
         }
         
         [HttpDelete("{taskId}")]
         public IActionResult Delete(int taskId)
         {
-            TodoTaskData data = new TodoTaskData();
+            var result = _data.DeleteTodoTaskById(taskId);
 
-            data.DeleteTodoTaskById(taskId);
-
-            return Ok();
+            return !result ? (IActionResult)NoContent() : Ok();
         }
     }
 }

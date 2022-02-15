@@ -12,13 +12,13 @@ using ConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBui
 
 namespace TwoTaskLibrary.Internal.DataAccess
 {
-    internal class SqlDataAccess
+    public class SqlDataAccess 
     {
-        public IConfiguration Configuration { get; set;  }
+        public IConfiguration Configuration { get; }
         public SqlDataAccess()
         {
             var config = new ConfigurationBuilder().AddJsonFile("appsettings.json");
-            Configuration = config.Build();
+            Configuration = config.Build(); 
         }
 
         public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)

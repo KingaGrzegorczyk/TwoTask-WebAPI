@@ -128,7 +128,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataAccess\TodoTaskData.cs" />
+    <Compile Include="Application\ITodoTaskRepository.cs" />
+    <Compile Include="Application\TodoTaskRepository.cs" />
     <Compile Include="Internal\DataAccess\SqlDataAccess.cs" />
     <Compile Include="Models\TodoTaskModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -137,7 +138,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Text.Json.6.0.2-mauipre.1.22054.8\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.6.0.2-mauipre.1.22054.8\build\System.Text.Json.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
