@@ -8,12 +8,12 @@ namespace TwoTaskWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TodoTasksController : ControllerBase
+    public class TodoTaskController : ControllerBase
     {
         private readonly SqlDataAccess _sql;
         private readonly TodoTaskRepository _data;
 
-        public TodoTasksController()
+        public TodoTaskController()
         {
             _sql = new SqlDataAccess();
             _data = new TodoTaskRepository(_sql);

@@ -14,6 +14,6 @@ BEGIN
 	SET NOCOUNT ON;
 
 	UPDATE dbo.TodoTask
-	SET ListId = @ListId, BeginDate = @BeginDate, @EndDate = @EndDate, RegionId = @RegionId, [Description] = @Description, Title = @Title, [Priority] = @Priority, [Status] = @Status, UserId = @UserId
+	SET ListId = @ListId, BeginDate = @BeginDate, EndDate = @EndDate, RegionId = @RegionId, [Description] = @Description, Title = @Title, [Priority] = @Priority, [Status] = @Status, UserId = @UserId
     WHERE Id = @Id;
 END

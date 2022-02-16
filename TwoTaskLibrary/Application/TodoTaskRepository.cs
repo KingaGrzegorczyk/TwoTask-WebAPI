@@ -18,7 +18,7 @@ namespace TwoTaskLibrary.Application
             _sql = sql;
         }
         public void SaveTodoTask(TodoTaskModel todoTask)
-        {    
+        {
             _sql.SaveData("dbo.spTodoTask_Insert", todoTask, "ConnectionStrings:TwoTaskData");
         }
         public List<TodoTaskModel> GetAllTodoTasks()
