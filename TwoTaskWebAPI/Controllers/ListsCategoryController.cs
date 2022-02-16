@@ -4,27 +4,28 @@ using TwoTaskLibrary.Application;
 using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 
+
 namespace TwoTaskWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TodoTasksListController : ControllerBase
+    public class ListsCategoryController : ControllerBase
     {
         private readonly SqlDataAccess _sql;
-        private readonly TodoTasksListRepository _data;
+        private readonly ListsCategoryRepository _data;
 
-        public TodoTasksListController()
+        public ListsCategoryController()
         {
             _sql = new SqlDataAccess();
-            _data = new TodoTasksListRepository(_sql);
+            _data = new ListsCategoryRepository(_sql);
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] TodoTasksListModel list)
+        public IActionResult Post([FromBody] ListsCategoryModel category)
         {
             try
             {
-                _data.SaveTodoTasksList(list);
+                _data.SaveListsCategory(category);
 
                 return Ok();
             }
@@ -38,21 +39,21 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_data.GetAllTodoTasksLists());
+            return Ok(_data.GetAllListsCategories());
         }
 
-        [HttpGet("{listId}")]
-        public IActionResult Get(int listId)
+        [HttpGet("{categoryId}")]
+        public IActionResult Get(int categoryId)
         {
-            return Ok(_data.GetTodoTasksListById(listId));
+            return Ok(_data.GetListsCategoryById(categoryId));
         }
 
-        [HttpPut("{listId}")]
-        public IActionResult Put(int listId, [FromBody] TodoTasksListModel list)
+        [HttpPut("{categoryId}")]
+        public IActionResult Put(int categoryId, [FromBody] ListsCategoryModel category)
         {
             try
             {
-                _data.UpdateTodoTasksListById(listId, list);
+                _data.UpdateListsCategoryById(categoryId, category);
                 return Ok();
             }
             catch (Exception)
@@ -62,10 +63,10 @@ namespace TwoTaskWebAPI.Controllers
 
         }
 
-        [HttpDelete("{listId}")]
-        public IActionResult Delete(int listId)
+        [HttpDelete("{categoryId}")]
+        public IActionResult Delete(int categoryId)
         {
-            var result = _data.DeleteTodoTasksListById(listId);
+            var result = _data.DeleteListsCategoryById(categoryId);
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

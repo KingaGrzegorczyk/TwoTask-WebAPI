@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[spTodoTasksList_Insert]
 	@Id INT, 
-    @Name VARCHAR(50), 
+    @Name NVARCHAR(50), 
     @CategoryId INT, 
     @IsArchived BIT, 
     @Colour NVARCHAR(25), 

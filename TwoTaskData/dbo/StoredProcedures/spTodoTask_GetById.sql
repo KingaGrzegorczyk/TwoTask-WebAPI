@@ -1,5 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[spTodoTask_GetById]
-	@Id int 
+	@Id INT 
 AS
 BEGIN
 	SET NOCOUNT ON;

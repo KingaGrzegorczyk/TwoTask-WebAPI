@@ -128,11 +128,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\IListsCategoryRepository.cs" />
     <Compile Include="Application\ITodoTaskRepository.cs" />
     <Compile Include="Application\ITodoTasksListRepository.cs" />
+    <Compile Include="Application\ListsCategoryRepository.cs" />
     <Compile Include="Application\TodoTaskRepository.cs" />
     <Compile Include="Application\TodoTasksListRepository.cs" />
     <Compile Include="Internal\DataAccess\SqlDataAccess.cs" />
+    <Compile Include="Models\ListsCategoryModel.cs" />
     <Compile Include="Models\TodoTaskModel.cs" />
     <Compile Include="Models\TodoTasksListModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

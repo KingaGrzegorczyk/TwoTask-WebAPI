@@ -14,6 +14,5 @@ namespace TwoTaskLibrary.Application
         TodoTaskModel GetTodoTaskById(int taskId);
         void UpdateTodoTaskById(int taskId, TodoTaskModel todoTask);
         bool DeleteTodoTaskById(int taskId);
-
     }
 }

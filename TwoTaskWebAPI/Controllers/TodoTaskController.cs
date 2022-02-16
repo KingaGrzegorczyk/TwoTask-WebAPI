@@ -22,9 +22,17 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] TodoTaskModel todoTask)
         {
-            _data.SaveTodoTask(todoTask);
+            try
+            {
+                _data.SaveTodoTask(todoTask);
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception)
+            {
+
+                return NoContent();
+            }
         }
 
         [HttpGet]
