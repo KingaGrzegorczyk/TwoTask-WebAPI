@@ -1,5 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[spListsCategory_DeleteById]
-		@Id INT
+	@Id INT
 AS
 BEGIN
 	SET NOCOUNT ON;

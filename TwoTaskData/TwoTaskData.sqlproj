@@ -83,5 +83,11 @@
     <Build Include="dbo\StoredProcedures\spListsCategory_GetById.sql" />
     <Build Include="dbo\StoredProcedures\spListsCategory_UpdateById.sql" />
     <Build Include="dbo\StoredProcedures\spListsCategory_DeleteById.sql" />
+    <Build Include="dbo\Tables\Region.sql" />
+    <Build Include="dbo\StoredProcedures\spRegion_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\spRegion_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\spRegion_GetById.sql" />
+    <Build Include="dbo\StoredProcedures\spRegion_UpdateById.sql" />
+    <Build Include="dbo\StoredProcedures\spRegion_DeleteById.sql" />
   </ItemGroup>
 </Project>
