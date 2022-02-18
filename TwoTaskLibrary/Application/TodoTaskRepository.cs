@@ -43,8 +43,7 @@ namespace TwoTaskLibrary.Application
             else
             {
                 throw new Exception("Task not found");
-            }
-            
+            }       
         }
         public bool DeleteTodoTaskById(int taskId)
         {

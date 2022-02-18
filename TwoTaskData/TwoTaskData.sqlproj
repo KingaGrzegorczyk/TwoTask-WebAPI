@@ -89,5 +89,14 @@
     <Build Include="dbo\StoredProcedures\spRegion_GetById.sql" />
     <Build Include="dbo\StoredProcedures\spRegion_UpdateById.sql" />
     <Build Include="dbo\StoredProcedures\spRegion_DeleteById.sql" />
+    <Build Include="dbo\Tables\Location.sql" />
+    <Build Include="dbo\StoredProcedures\spLocation_Insert.sql" />
+    <Build Include="dbo\StoredProcedures\spLocation_GetAll.sql" />
+    <Build Include="dbo\StoredProcedures\spLocation_GetById.sql" />
+    <Build Include="dbo\StoredProcedures\spLocation_UpdateById.sql" />
+    <Build Include="dbo\StoredProcedures\spLocation_DeleteById.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="TwoTaskData.refactorlog" />
   </ItemGroup>
 </Project>
