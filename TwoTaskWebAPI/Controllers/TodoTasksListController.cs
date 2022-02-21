@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TwoTaskLibrary.Application;
 using TwoTaskLibrary.Internal.DataAccess;
@@ -8,6 +9,7 @@ namespace TwoTaskWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     public class TodoTasksListController : ControllerBase
     {
         private readonly SqlDataAccess _sql;
