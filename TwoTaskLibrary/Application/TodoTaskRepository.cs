@@ -21,21 +21,21 @@ namespace TwoTaskLibrary.Application
         {
             _sql.SaveData("dbo.spTodoTask_Insert", todoTask, "ConnectionStrings:TwoTaskData");
         }
-        public List<TodoTaskModel> GetAllTodoTasks()
+        public List<TodoTaskModel> GetAllTodoTasks(Guid userId)
         {
-            var output = _sql.LoadData<TodoTaskModel, dynamic>("dbo.spTodoTask_GetAll", new { }, "ConnectionStrings:TwoTaskData");
+            var output = _sql.LoadData<TodoTaskModel, dynamic>("dbo.spTodoTask_GetAll", new { UserId = userId }, "ConnectionStrings:TwoTaskData");
 
             return output;
         }
-        public TodoTaskModel GetTodoTaskById(int taskId)
+        public TodoTaskModel GetTodoTaskById(int taskId, Guid userId)
         {
-            var output = _sql.LoadData<TodoTaskModel, dynamic>("dbo.spTodoTask_GetById", new { Id = taskId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var output = _sql.LoadData<TodoTaskModel, dynamic>("dbo.spTodoTask_GetById", new { Id = taskId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
 
             return output;
         }
-        public void UpdateTodoTaskById(int taskId, TodoTaskModel todoTask)
+        public void UpdateTodoTaskById(int taskId, TodoTaskModel todoTask, Guid userId)
         {
-            var taskToUpdate = _sql.LoadData<TodoTaskModel, dynamic>("dbo.spTodoTask_GetById", new { Id = taskId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var taskToUpdate = _sql.LoadData<TodoTaskModel, dynamic>("dbo.spTodoTask_GetById", new { Id = taskId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
             if(taskToUpdate != null)
             {
                 _sql.UpdateData("dbo.spTodoTask_UpdateById", todoTask, "ConnectionStrings:TwoTaskData");
@@ -45,14 +45,14 @@ namespace TwoTaskLibrary.Application
                 throw new Exception("Task not found");
             }       
         }
-        public bool DeleteTodoTaskById(int taskId)
+        public bool DeleteTodoTaskById(int taskId, Guid userId)
         {
-            var taskToDelete = _sql.LoadData<TodoTaskModel, dynamic>("dbo.spTodoTask_GetById", new { Id = taskId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var taskToDelete = _sql.LoadData<TodoTaskModel, dynamic>("dbo.spTodoTask_GetById", new { Id = taskId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
             if (taskToDelete == null)
                 return false;
             else
             {
-                _sql.DeleteData("dbo.spTodoTask_DeleteById", new { Id = taskId }, "ConnectionStrings:TwoTaskData");
+                _sql.DeleteData("dbo.spTodoTask_DeleteById", new { Id = taskId, UserId = userId }, "ConnectionStrings:TwoTaskData");
                 return true;
             }            
         }

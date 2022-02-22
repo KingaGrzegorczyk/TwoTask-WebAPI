@@ -8,12 +8,12 @@
     @Title NVARCHAR(50), 
     @Priority INT, 
     @Status NVARCHAR(50), 
-    @UserId NVARCHAR(128)
+    @UserId UNIQUEIDENTIFIER
 AS
 BEGIN
 	SET NOCOUNT ON;
 
 	UPDATE dbo.TodoTask
 	SET ListId = @ListId, BeginDate = @BeginDate, EndDate = @EndDate, RegionId = @RegionId, [Description] = @Description, Title = @Title, [Priority] = @Priority, [Status] = @Status, UserId = @UserId
-    WHERE Id = @Id;
+    WHERE Id = @Id AND UserId = @UserId;
 END

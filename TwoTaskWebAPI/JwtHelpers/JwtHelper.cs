@@ -31,7 +31,6 @@ namespace TwoTaskWebAPI.JwtHelpers
             {
                 var UserToken = new UserToken();
                 if (model == null) throw new ArgumentException(nameof(model));
-                // Get secret key
                 var key = System.Text.Encoding.ASCII.GetBytes(jwtSettings.IssuerSigningKey);
                 Guid Id = Guid.Empty;
                 DateTime expireTime = DateTime.UtcNow.AddDays(1);

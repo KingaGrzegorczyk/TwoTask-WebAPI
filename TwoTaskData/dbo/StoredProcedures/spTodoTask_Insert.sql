@@ -8,7 +8,7 @@
     @Title NVARCHAR(50), 
     @Priority INT, 
     @Status NVARCHAR(50), 
-    @UserId NVARCHAR(128)
+    @UserId UNIQUEIDENTIFIER
 AS
 BEGIN
 	SET NOCOUNT ON;

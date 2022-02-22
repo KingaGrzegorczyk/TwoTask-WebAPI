@@ -7,4 +7,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Radius " />
   </Operation>
+  <Operation Name="Rename Refactor" Key="11038ea5-ba31-4785-89a3-04d2c2dc55e4" ChangeDateTime="02/22/2022 12:03:37">
+    <Property Name="ElementName" Value="[dbo].[FK_TodoTask_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[TodoTask]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_TodoTask_ToUser]" />
+  </Operation>
 </Operations>

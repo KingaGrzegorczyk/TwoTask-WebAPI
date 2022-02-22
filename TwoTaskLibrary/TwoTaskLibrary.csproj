@@ -144,6 +144,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\AccountRepository.cs" />
+    <Compile Include="Application\IAccountRepository.cs" />
     <Compile Include="Application\IListsCategoryRepository.cs" />
     <Compile Include="Application\ILocationRepository.cs" />
     <Compile Include="Application\IRegionRepository.cs" />

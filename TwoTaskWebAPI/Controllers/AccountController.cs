@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TwoTaskLibrary.Models;
 using TwoTaskWebAPI.JwtHelpers;
+using TwoTaskLibrary.Internal.DataAccess;
 
 namespace TwoTaskWebAPI.Controllers
 {
@@ -13,56 +14,56 @@ namespace TwoTaskWebAPI.Controllers
         private readonly JwtSettings _jwtSettings;
         public AccountController(JwtSettings jwtSettings)
         {
-            this._jwtSettings = jwtSettings;
+            _jwtSettings = jwtSettings;
         }
-        private IEnumerable<UserModel> logins = new List<UserModel>() {
-            new UserModel() {
-                    Id = Guid.NewGuid(),
-                        Email = "adminakp@gmail.com",
-                        UserName = "Admin",
-                        Password = "Admin",
-                },
-                new UserModel() {
-                    Id = Guid.NewGuid(),
-                        Email = "adminakp@gmail.com",
-                        UserName = "User1",
-                        Password = "Admin",
-                }
-        };
+        
         [HttpPost]
-        public IActionResult GetToken(UserLoginModel userLogins)
+        public IActionResult Login(UserLoginModel userLogin)
         {
-            try
-            {
-                var Token = new UserToken();
-                var Valid = logins.Any(x => x.UserName.Equals(userLogins.UserName, StringComparison.OrdinalIgnoreCase));
-                if (Valid)
+            SqlDataAccess _sql = new SqlDataAccess();
+            var users = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetAll", new {  }, "ConnectionStrings:TwoTaskData");
+            var Token = new UserToken();
+            if (users != null)
+            {                
+                var validUserName = users.Any(x => x.UserName.Equals(userLogin.UserName, StringComparison.OrdinalIgnoreCase));
+                if (validUserName)
                 {
-                    var user = logins.FirstOrDefault(x => x.UserName.Equals(userLogins.UserName, StringComparison.OrdinalIgnoreCase));
-                    Token = JwtHelper.GenTokenkey(new UserToken()
+                    var validPassword = users.Any(x => x.Password.Equals(userLogin.Password, StringComparison.OrdinalIgnoreCase));
+                    if(validPassword)
                     {
-                        Email = user.Email,
-                        UserName = user.UserName,
-                        Id = user.Id,
-                    }, _jwtSettings);
+                        var user = users.FirstOrDefault(x => x.UserName.Equals(userLogin.UserName, StringComparison.OrdinalIgnoreCase));
+                        Token = JwtHelper.GenTokenkey(new UserToken()
+                        {
+                            Email = user.Email,
+                            UserName = user.UserName,
+                            Id = user.Id,
+                        }, _jwtSettings);
+                        return Ok(Token);
+                    }
+                    else
+                    {
+                        return BadRequest($"wrong password");
+                    }
+                    
                 }
                 else
                 {
-                    return BadRequest($"wrong password");
+                    return BadRequest($"wrong username");
                 }
-                return Ok(Token);
+                
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            else
+                return BadRequest($"there is no user");
+
         }
 
         [HttpGet]
         [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
-        public IActionResult GetList()
+        public IActionResult GetAllUsers()
         {
-            return Ok(logins);
+            SqlDataAccess _sql = new SqlDataAccess();
+            var users = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetAll", new { }, "ConnectionStrings:TwoTaskData");
+            return Ok(users);
         }
     }
 }

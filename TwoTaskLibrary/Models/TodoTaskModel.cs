@@ -17,6 +17,6 @@ namespace TwoTaskLibrary.Models
         public string Title { get; set; }
         public int Priority { get; set; }
         public string Status { get; set; } = null;
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
     }
 }

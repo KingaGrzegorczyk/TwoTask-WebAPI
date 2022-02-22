@@ -26,6 +26,9 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
+                var currentUser = HttpContext.User;
+               
+                todoTask.UserId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
                 _data.SaveTodoTask(todoTask);
 
                 return Ok();
@@ -40,13 +43,19 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_data.GetAllTodoTasks());
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+
+            return Ok(_data.GetAllTodoTasks(userId));
         }
 
         [HttpGet("{taskId}")]
         public IActionResult Get(int taskId)
         {
-            return Ok(_data.GetTodoTaskById(taskId));
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+
+            return Ok(_data.GetTodoTaskById(taskId, userId));
         }
 
         [HttpPut("{taskId}")]
@@ -54,7 +63,10 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                _data.UpdateTodoTaskById(taskId, todoTask);
+                var currentUser = HttpContext.User;
+                var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+                todoTask.UserId = userId;
+               _data.UpdateTodoTaskById(taskId, todoTask, userId);
                 return Ok();
             }
             catch(Exception)
@@ -67,7 +79,9 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{taskId}")]
         public IActionResult Delete(int taskId)
         {
-            var result = _data.DeleteTodoTaskById(taskId);
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var result = _data.DeleteTodoTaskById(taskId, userId);
 
             return !result ? (IActionResult)NoContent() : Ok();
         }
