@@ -1,10 +1,11 @@
 ﻿CREATE PROCEDURE [dbo].[spRegion_Insert]
 	@Id INT, 
-    @Name NVARCHAR(50)
+    @Name NVARCHAR(50),
+	@UserId UNIQUEIDENTIFIER
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO dbo.Region([Name])
-	VALUES (@Name);
+	INSERT INTO dbo.Region([Name], UserId)
+	VALUES (@Name, @UserId);
 END

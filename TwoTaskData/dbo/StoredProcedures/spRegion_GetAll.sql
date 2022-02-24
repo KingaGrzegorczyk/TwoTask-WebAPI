@@ -1,9 +1,11 @@
 ﻿CREATE PROCEDURE [dbo].[spRegion_GetAll]
-	AS
+	@UserId UNIQUEIDENTIFIER
+AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT Id, [Name]
+	SELECT Id, [Name], UserId
 	FROM [dbo].[Region]
+	WHERE UserId = @UserId
 	ORDER BY Id;
 END

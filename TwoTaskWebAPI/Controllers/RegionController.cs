@@ -26,6 +26,9 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
+                var currentUser = HttpContext.User;
+
+                region.UserId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
                 _data.SaveRegion(region);
 
                 return Ok();
@@ -40,13 +43,19 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_data.GetAllRegions());
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+
+            return Ok(_data.GetAllRegions(userId));
         }
 
         [HttpGet("{regionId}")]
         public IActionResult Get(int regionId)
         {
-            return Ok(_data.GetRegionById(regionId));
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+
+            return Ok(_data.GetRegionById(regionId, userId));
         }
 
         [HttpPut("{regionId}")]
@@ -54,7 +63,11 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                _data.UpdateRegionById(regionId, region);
+                var currentUser = HttpContext.User;
+                var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+                region.UserId = userId;
+
+                _data.UpdateRegionById(regionId, region, userId);
                 return Ok();
             }
             catch (Exception)
@@ -67,7 +80,9 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{regionId}")]
         public IActionResult Delete(int regionId)
         {
-            var result = _data.DeletegionById(regionId);
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var result = _data.DeletegionById(regionId, userId);
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

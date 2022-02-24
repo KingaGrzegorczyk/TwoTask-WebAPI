@@ -1,11 +1,12 @@
 ﻿CREATE PROCEDURE [dbo].[spTodoTasksList_GetById]
-	@Id INT 
+	@Id INT,
+	@UserId UNIQUEIDENTIFIER
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT Id, [Name], CategoryId, IsArchived, Colour, Privacy
+	SELECT Id, [Name], CategoryId, IsArchived, Colour, Privacy, UserId
 	FROM [dbo].[TodoTasksList]
-	WHERE Id = @Id;
+	WHERE Id = @Id AND UserId = @UserId;
 END
 

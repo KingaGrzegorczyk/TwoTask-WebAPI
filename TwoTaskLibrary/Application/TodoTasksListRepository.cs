@@ -19,21 +19,21 @@ namespace TwoTaskLibrary.Application
         {           
             _sql.SaveData("dbo.spTodoTasksList_Insert", list, "ConnectionStrings:TwoTaskData");
         }
-        public List<TodoTasksListModel> GetAllTodoTasksLists()
+        public List<TodoTasksListModel> GetAllTodoTasksLists(Guid userId)
         {
-            var output = _sql.LoadData<TodoTasksListModel, dynamic>("dbo.spTodoTasksList_GetAll", new { }, "ConnectionStrings:TwoTaskData");
+            var output = _sql.LoadData<TodoTasksListModel, dynamic>("dbo.spTodoTasksList_GetAll", new { UserId = userId  }, "ConnectionStrings:TwoTaskData");
 
             return output;
         }
-        public TodoTasksListModel GetTodoTasksListById(int listId)
+        public TodoTasksListModel GetTodoTasksListById(int listId, Guid userId)
         {
-            var output = _sql.LoadData<TodoTasksListModel, dynamic>("dbo.spTodoTasksList_GetById", new { Id = listId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var output = _sql.LoadData<TodoTasksListModel, dynamic>("dbo.spTodoTasksList_GetById", new { Id = listId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
 
             return output;
         }
-        public void UpdateTodoTasksListById(int listId, TodoTasksListModel list)
+        public void UpdateTodoTasksListById(int listId, TodoTasksListModel list, Guid userId)
         {
-            var listToUpdate = _sql.LoadData<TodoTasksListModel, dynamic>("dbo.spTodoTasksList_GetById", new { Id = listId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var listToUpdate = _sql.LoadData<TodoTasksListModel, dynamic>("dbo.spTodoTasksList_GetById", new { Id = listId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
             if (listToUpdate != null)
             {
                 _sql.UpdateData("dbo.spTodoTasksList_UpdateById", list, "ConnectionStrings:TwoTaskData");
@@ -43,14 +43,14 @@ namespace TwoTaskLibrary.Application
                 throw new Exception("List not found");
             }
         }
-        public bool DeleteTodoTasksListById(int listId)
+        public bool DeleteTodoTasksListById(int listId, Guid userId)
         {
-            var listToDelete = _sql.LoadData<TodoTasksListModel, dynamic>("dbo.spTodoTasksList_GetById", new { Id = listId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var listToDelete = _sql.LoadData<TodoTasksListModel, dynamic>("dbo.spTodoTasksList_GetById", new { Id = listId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
             if (listToDelete == null)
                 return false;
             else
             {
-                _sql.DeleteData("dbo.spTodoTasksList_DeleteById", new { Id = listId }, "ConnectionStrings:TwoTaskData");
+                _sql.DeleteData("dbo.spTodoTasksList_DeleteById", new { Id = listId, UserId = userId }, "ConnectionStrings:TwoTaskData");
                 return true;
             }
         }

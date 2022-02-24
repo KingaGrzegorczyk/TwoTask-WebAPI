@@ -3,11 +3,12 @@
     @RegionId INT, 
     @Latitude DECIMAL, 
     @Longitude DECIMAL, 
-    @Radius INT 
+    @Radius INT,
+	@UserId UNIQUEIDENTIFIER
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	INSERT INTO dbo.[Location](RegionId, Latitude, Longitude, Radius)
-	VALUES (@RegionId, @Latitude, @Longitude, @Radius);
+	INSERT INTO dbo.[Location](RegionId, Latitude, Longitude, Radius, UserId)
+	VALUES (@RegionId, @Latitude, @Longitude, @Radius, @UserId);
 END

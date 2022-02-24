@@ -1,10 +1,11 @@
 ﻿CREATE PROCEDURE [dbo].[spRegion_GetById]
-	@Id INT
+	@Id INT,
+	@UserId UNIQUEIDENTIFIER
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT Id, [Name]
+	SELECT Id, [Name], UserId
 	FROM [dbo].[Region]
-	WHERE Id = @Id;
+	WHERE Id = @Id AND UserId = @UserId;
 END

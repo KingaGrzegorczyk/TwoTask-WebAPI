@@ -20,21 +20,21 @@ namespace TwoTaskLibrary.Application
         {
             _sql.SaveData("dbo.spRegion_Insert", region, "ConnectionStrings:TwoTaskData");
         }
-        public List<RegionModel> GetAllRegions()
+        public List<RegionModel> GetAllRegions(Guid userId)
         {
-            var output = _sql.LoadData<RegionModel, dynamic>("dbo.spRegion_GetAll", new { }, "ConnectionStrings:TwoTaskData");
+            var output = _sql.LoadData<RegionModel, dynamic>("dbo.spRegion_GetAll", new { UserId = userId }, "ConnectionStrings:TwoTaskData");
 
             return output;
         }
-        public RegionModel GetRegionById(int regionId)
+        public RegionModel GetRegionById(int regionId, Guid userId)
         {
-            var output = _sql.LoadData<RegionModel, dynamic>("dbo.spRegion_GetById", new { Id = regionId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var output = _sql.LoadData<RegionModel, dynamic>("dbo.spRegion_GetById", new { Id = regionId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
 
             return output;
         }
-        public void UpdateRegionById(int regionId, RegionModel region)
+        public void UpdateRegionById(int regionId, RegionModel region, Guid userId)
         {
-            var regionToUpdate = _sql.LoadData<RegionModel, dynamic>("dbo.spRegion_GetById", new { Id = regionId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var regionToUpdate = _sql.LoadData<RegionModel, dynamic>("dbo.spRegion_GetById", new { Id = regionId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
             if (regionToUpdate != null)
             {
                 _sql.UpdateData("dbo.spRegion_UpdateById", region, "ConnectionStrings:TwoTaskData");
@@ -44,14 +44,14 @@ namespace TwoTaskLibrary.Application
                 throw new Exception("Region not found");
             }
         }
-        public bool DeletegionById(int regionId)
+        public bool DeletegionById(int regionId, Guid userId)
         {
-            var regionToDelete = _sql.LoadData<RegionModel, dynamic>("dbo.spRegion_GetById", new { Id = regionId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var regionToDelete = _sql.LoadData<RegionModel, dynamic>("dbo.spRegion_GetById", new { Id = regionId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
             if (regionToDelete == null)
                 return false;
             else
             {
-                _sql.DeleteData("dbo.spRegion_DeleteById", new { Id = regionId }, "ConnectionStrings:TwoTaskData");
+                _sql.DeleteData("dbo.spRegion_DeleteById", new { Id = regionId, UserId = userId }, "ConnectionStrings:TwoTaskData");
                 return true;
             }
         }

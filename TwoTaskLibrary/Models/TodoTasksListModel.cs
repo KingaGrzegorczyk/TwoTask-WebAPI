@@ -14,6 +14,8 @@ namespace TwoTaskLibrary.Models
         public bool IsArchived { get; set; }
         public string Colour { get; set; }
         public string Privacy { get; set; }
+        public Guid UserId { get; set; }
+        public int GroupId { get; set; }
 
     }
 }

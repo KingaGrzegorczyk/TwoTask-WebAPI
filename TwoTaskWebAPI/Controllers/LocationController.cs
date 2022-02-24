@@ -27,6 +27,9 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
+                var currentUser = HttpContext.User;
+
+                location.UserId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
                 _data.SaveLocation(location);
 
                 return Ok();
@@ -41,13 +44,19 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_data.GetAllLocations());
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+
+            return Ok(_data.GetAllLocations(userId));
         }
 
         [HttpGet("{locationId}")]
         public IActionResult Get(int locationId)
         {
-            return Ok(_data.GetLocationById(locationId));
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+
+            return Ok(_data.GetLocationById(locationId, userId));
         }
 
         [HttpPut("{locationId}")]
@@ -55,7 +64,11 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                _data.UpdateLocationById(locationId, location);
+                var currentUser = HttpContext.User;
+                var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+                location.UserId = userId;
+
+                _data.UpdateLocationById(locationId, location, userId);
                 return Ok();
             }
             catch (Exception)
@@ -68,7 +81,9 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{locationId}")]
         public IActionResult Delete(int locationId)
         {
-            var result = _data.DeleteLocationById(locationId);
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var result = _data.DeleteLocationById(locationId, userId);
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

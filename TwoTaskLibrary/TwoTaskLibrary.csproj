@@ -145,7 +145,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application\AccountRepository.cs" />
+    <Compile Include="Application\GroupRepository.cs" />
     <Compile Include="Application\IAccountRepository.cs" />
+    <Compile Include="Application\IGroupRepository.cs" />
     <Compile Include="Application\IListsCategoryRepository.cs" />
     <Compile Include="Application\ILocationRepository.cs" />
     <Compile Include="Application\IRegionRepository.cs" />
@@ -157,6 +159,7 @@
     <Compile Include="Application\TodoTaskRepository.cs" />
     <Compile Include="Application\TodoTasksListRepository.cs" />
     <Compile Include="Internal\DataAccess\SqlDataAccess.cs" />
+    <Compile Include="Models\GroupModel.cs" />
     <Compile Include="Models\ListsCategoryModel.cs" />
     <Compile Include="Models\LocationModel.cs" />
     <Compile Include="Models\RegionModel.cs" />
@@ -164,6 +167,7 @@
     <Compile Include="Models\TodoTasksListModel.cs" />
     <Compile Include="Models\UserLoginModel.cs" />
     <Compile Include="Models\UserModel.cs" />
+    <Compile Include="Models\UsersInGroupModel.cs" />
     <Compile Include="Models\UserToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

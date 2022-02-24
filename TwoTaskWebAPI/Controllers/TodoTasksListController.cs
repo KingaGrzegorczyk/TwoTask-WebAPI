@@ -26,6 +26,9 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
+                var currentUser = HttpContext.User;
+
+                list.UserId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
                 _data.SaveTodoTasksList(list);
 
                 return Ok();
@@ -40,13 +43,19 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_data.GetAllTodoTasksLists());
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+
+            return Ok(_data.GetAllTodoTasksLists(userId));
         }
 
         [HttpGet("{listId}")]
         public IActionResult Get(int listId)
         {
-            return Ok(_data.GetTodoTasksListById(listId));
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+
+            return Ok(_data.GetTodoTasksListById(listId, userId));
         }
 
         [HttpPut("{listId}")]
@@ -54,7 +63,11 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                _data.UpdateTodoTasksListById(listId, list);
+                var currentUser = HttpContext.User;
+                var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+                list.UserId = userId;
+
+                _data.UpdateTodoTasksListById(listId, list, userId);
                 return Ok();
             }
             catch (Exception)
@@ -67,7 +80,9 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{listId}")]
         public IActionResult Delete(int listId)
         {
-            var result = _data.DeleteTodoTasksListById(listId);
+            var currentUser = HttpContext.User;
+            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var result = _data.DeleteTodoTasksListById(listId, userId);
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

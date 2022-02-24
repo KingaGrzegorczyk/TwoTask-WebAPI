@@ -1,10 +1,11 @@
 ﻿CREATE PROCEDURE [dbo].[spListsCategory_GetById]
-	@Id INT
+	@Id INT,
+	@UserId UNIQUEIDENTIFIER
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT Id, [Name], CategoryId
+	SELECT Id, [Name], CategoryId, UserId
 	FROM [dbo].[ListsCategory]
-	WHERE Id = @Id;
+	WHERE Id = @Id AND UserId = @UserId;
 END

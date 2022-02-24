@@ -20,21 +20,21 @@ namespace TwoTaskLibrary.Application
         {
             _sql.SaveData("dbo.spLocation_Insert", location, "ConnectionStrings:TwoTaskData");
         }
-        public List<LocationModel> GetAllLocations()
+        public List<LocationModel> GetAllLocations(Guid userId)
         {
-            var output = _sql.LoadData<LocationModel, dynamic>("dbo.spLocation_GetAll", new { }, "ConnectionStrings:TwoTaskData");
+            var output = _sql.LoadData<LocationModel, dynamic>("dbo.spLocation_GetAll", new { UserId = userId }, "ConnectionStrings:TwoTaskData");
 
             return output;
         }
-        public LocationModel GetLocationById(int locationId)
+        public LocationModel GetLocationById(int locationId, Guid userId)
         {
-            var output = _sql.LoadData<LocationModel, dynamic>("dbo.spLocation_GetById", new { Id = locationId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var output = _sql.LoadData<LocationModel, dynamic>("dbo.spLocation_GetById", new { Id = locationId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
 
             return output;
         }
-        public void UpdateLocationById(int locationId, LocationModel location)
+        public void UpdateLocationById(int locationId, LocationModel location, Guid userId)
         {
-            var locationToUpdate = _sql.LoadData<LocationModel, dynamic>("dbo.spLocation_GetById", new { Id = locationId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var locationToUpdate = _sql.LoadData<LocationModel, dynamic>("dbo.spLocation_GetById", new { Id = locationId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
             if (locationToUpdate != null)
             {
                 _sql.UpdateData("dbo.spLocation_UpdateById", location, "ConnectionStrings:TwoTaskData");
@@ -44,14 +44,14 @@ namespace TwoTaskLibrary.Application
                 throw new Exception("Location not found");
             }
         }
-        public bool DeleteLocationById(int locationId)
+        public bool DeleteLocationById(int locationId, Guid userId)
         {
-            var locationkToDelete = _sql.LoadData<LocationModel, dynamic>("dbo.spLocation_GetById", new { Id = locationId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
-            if (locationkToDelete == null)
+            var locationToDelete = _sql.LoadData<LocationModel, dynamic>("dbo.spLocation_GetById", new { Id = locationId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            if (locationToDelete == null)
                 return false;
             else
             {
-                _sql.DeleteData("dbo.spLocation_DeleteById", new { Id = locationId }, "ConnectionStrings:TwoTaskData");
+                _sql.DeleteData("dbo.spLocation_DeleteById", new { Id = locationId, UserId = userId }, "ConnectionStrings:TwoTaskData");
                 return true;
             }
         }

@@ -3,12 +3,13 @@
     @RegionId INT, 
     @Latitude DECIMAL, 
     @Longitude DECIMAL, 
-    @Radius INT 
+    @Radius INT,
+    @UserId UNIQUEIDENTIFIER
 AS
 BEGIN
 	SET NOCOUNT ON;
 
 	UPDATE dbo.[Location]
-	SET RegionId = @RegionId, Latitude = @Latitude, Longitude = @Longitude, Radius = @Radius
-    WHERE Id = @Id;
+	SET RegionId = @RegionId, Latitude = @Latitude, Longitude = @Longitude, Radius = @Radius, UserId = @UserId
+    WHERE Id = @Id AND UserId = @UserId;
 END
