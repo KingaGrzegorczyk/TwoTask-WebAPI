@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using TwoTaskLibrary.Models;
 using TwoTaskWebAPI.JwtHelpers;
 using TwoTaskLibrary.Internal.DataAccess;
+using System.Security.Cryptography;
+using System.Text;
+using TwoTaskLibrary.Application;
 
 namespace TwoTaskWebAPI.Controllers
 {
@@ -12,11 +15,38 @@ namespace TwoTaskWebAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly JwtSettings _jwtSettings;
+        private readonly SqlDataAccess _sql;
+        private readonly AccountRepository _data;
+        
         public AccountController(JwtSettings jwtSettings)
         {
             _jwtSettings = jwtSettings;
+            _sql = new SqlDataAccess();
+            _data = new AccountRepository(_sql);
         }
-        
+
+        [HttpPost]
+        public IActionResult Register(UserRegisterModel register)
+        {
+            if(_data.CheckIfUserExists(register.Username)) 
+                return BadRequest("UserName Is Already Taken");
+            else
+            {
+                var hmac = new HMACSHA512();
+
+                var user = new UserModel
+                {
+                    Id = Guid.NewGuid(),
+                    UserName = register.Username.ToLower(),
+                    Email = register.Email,
+                    Password = hmac.ComputeHash(Encoding.UTF8.GetBytes(register.Password.ToCharArray())),
+                    PasswordSalt = hmac.Key
+                };
+                _data.Register(user);
+                return Ok();
+            }           
+        }
+
         [HttpPost]
         public IActionResult Login(UserLoginModel userLogin)
         {
@@ -24,32 +54,31 @@ namespace TwoTaskWebAPI.Controllers
             var users = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetAll", new {  }, "ConnectionStrings:TwoTaskData");
             var Token = new UserToken();
             if (users != null)
-            {                
-                var validUserName = users.Any(x => x.UserName.Equals(userLogin.UserName, StringComparison.OrdinalIgnoreCase));
-                if (validUserName)
-                {
-                    var validPassword = users.Any(x => x.Password.Equals(userLogin.Password, StringComparison.OrdinalIgnoreCase));
-                    if(validPassword)
-                    {
-                        var user = users.FirstOrDefault(x => x.UserName.Equals(userLogin.UserName, StringComparison.OrdinalIgnoreCase));
-                        Token = JwtHelper.GenTokenkey(new UserToken()
-                        {
-                            Email = user.Email,
-                            UserName = user.UserName,
-                            Id = user.Id,
-                        }, _jwtSettings);
-                        return Ok(Token);
-                    }
-                    else
-                    {
-                        return BadRequest($"wrong password");
-                    }
-                    
-                }
+            {
+                var user = users.FirstOrDefault(x => x.UserName == userLogin.UserName);
+
+                if (user == null) 
+                    return Unauthorized("Invalid UserName");
                 else
                 {
-                    return BadRequest($"wrong username");
-                }
+                    var hmac = new HMACSHA512(user.PasswordSalt);
+
+                    var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userLogin.Password.ToCharArray()));
+
+                    for (int i = 0; i < computedHash.Length; i++)
+                    {
+                        if (computedHash[i] != user.Password[i]) 
+                            return Unauthorized("Invalid Password");
+                    }
+                    Token = JwtHelper.GenTokenkey(new UserToken()
+                    {
+                        Email = user.Email,
+                        UserName = user.UserName,
+                        Id = user.Id,
+                    }, _jwtSettings);
+                    return Ok(Token);
+
+                }            
                 
             }
             else

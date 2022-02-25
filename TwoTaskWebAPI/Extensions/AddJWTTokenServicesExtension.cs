@@ -7,7 +7,6 @@ namespace TwoTaskWebAPI.Extensions
     {
         public static void AddJWTTokenServices(this IServiceCollection Services, IConfiguration Configuration)
         {
-            // Add Jwt Setings
             var bindJwtSettings = new JwtSettings();
             Configuration.Bind("JsonWebTokenKeys", bindJwtSettings);
             Services.AddSingleton(bindJwtSettings);

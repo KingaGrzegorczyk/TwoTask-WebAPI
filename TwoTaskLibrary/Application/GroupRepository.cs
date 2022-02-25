@@ -26,15 +26,15 @@ namespace TwoTaskLibrary.Application
 
             return output;
         }
-        public GroupModel GetGroupById(int groupId, Guid userId)
+        public GroupModel GetGroupById(int groupId)
         {
-            var output = _sql.LoadData<GroupModel, dynamic>("dbo.spGroup_GetById", new { Id = groupId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var output = _sql.LoadData<GroupModel, dynamic>("dbo.spGroup_GetById", new { Id = groupId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
 
             return output;
         }
         public void UpdateGroupById(int groupId, GroupModel group, Guid userId)
         {
-            var groupToUpdate = _sql.LoadData<GroupModel, dynamic>("dbo.spGroup_GetById", new { Id = groupId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var groupToUpdate = _sql.LoadData<GroupModel, dynamic>("dbo.spGroup_GetById", new { Id = groupId, OwnerId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
             if (groupToUpdate != null)
             {
                 _sql.UpdateData("dbo.spGroup_UpdateById", group, "ConnectionStrings:TwoTaskData");
@@ -44,9 +44,9 @@ namespace TwoTaskLibrary.Application
                 throw new Exception("Group not found");
             }
         }
-        public bool DeleteGroupyById(int groupId, Guid userId)
+        public bool DeleteGroupById(int groupId, Guid userId)
         {
-            var groupToDelete = _sql.LoadData<GroupModel, dynamic>("dbo.spGroup_GetById", new { Id = groupId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var groupToDelete = _sql.LoadData<GroupModel, dynamic>("dbo.spGroup_GetById", new { Id = groupId, OwnerId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
             if (groupToDelete == null)
                 return false;
             else
@@ -59,6 +59,12 @@ namespace TwoTaskLibrary.Application
         {
             _sql.SaveData("dbo.spUsersInGroup_Insert", userInGroup, "ConnectionStrings:TwoTaskData");
         }
+        public List<UsersInGroupModel> GetAllUsersInGroup(int groupId)
+        {
+            var output = _sql.LoadData<UsersInGroupModel, dynamic>("dbo.spUsersInGroup_GetAll", new { GroupId = groupId }, "ConnectionStrings:TwoTaskData");
+
+            return output;
+        }
         public bool DeleteUserFromGroup(int groupId, Guid userId)
         {
             var userInGroupToDelete = _sql.LoadData<GroupModel, dynamic>("dbo.spUsersInGroup_GetById", new { GroupId = groupId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
@@ -66,7 +72,7 @@ namespace TwoTaskLibrary.Application
                 return false;
             else
             {
-                _sql.DeleteData("dbo.spUsersInGroup_DeleteUserById", new { Id = groupId, UserId = userId }, "ConnectionStrings:TwoTaskData");
+                _sql.DeleteData("dbo.spUsersInGroup_DeleteUserById", new { Id = userInGroupToDelete.Id }, "ConnectionStrings:TwoTaskData");
                 return true;
             }
         }

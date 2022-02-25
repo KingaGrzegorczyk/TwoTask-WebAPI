@@ -11,9 +11,9 @@ namespace TwoTaskLibrary.Application
     {
         void SaveGroup(GroupModel group);
         List<GroupModel> GetAllGroups(Guid userId);
-        GroupModel GetGroupById(int groupId, Guid userId);
+        GroupModel GetGroupById(int groupId);
         void UpdateGroupById(int groupId, GroupModel group, Guid userId);
-        bool DeleteGroupyById(int groupId, Guid userId);
+        bool DeleteGroupById(int groupId, Guid userId);
         void SaveUserInGroup(UsersInGroupModel userInGroup);
         bool DeleteUserFromGroup(int groupId, Guid userId);
     }

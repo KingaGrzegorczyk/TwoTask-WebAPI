@@ -8,25 +8,10 @@ namespace TwoTaskLibrary.Models
 {
     public class UserModel
     {
-        public string UserName
-        {
-            get;
-            set;
-        }
-        public Guid Id
-        {
-            get;
-            set;
-        }
-        public string Email
-        {
-            get;
-            set;
-        }
-        public string Password
-        {
-            get;
-            set;
-        }
+        public string UserName { get; set; }     
+        public Guid Id { get; set; }
+        public string Email { get; set; }
+        public byte[] Password { get; set; }
+        public byte[] PasswordSalt { get; set; }
     }
 }

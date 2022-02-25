@@ -3,5 +3,6 @@
 	[Id] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY, 
     [UserName] NVARCHAR(20) NOT NULL, 
     [Email] NVARCHAR(30) NOT NULL, 
-    [Password] NVARCHAR(30) NOT NULL
+    [Password] VARBINARY(64) NOT NULL, 
+    [PasswordSalt] VARBINARY(128) NOT NULL
 )

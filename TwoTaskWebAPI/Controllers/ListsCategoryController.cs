@@ -29,7 +29,7 @@ namespace TwoTaskWebAPI.Controllers
             {
                 var currentUser = HttpContext.User;
 
-                category.UserId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+                category.UserId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
                 _data.SaveListsCategory(category);
 
                 return Ok();
@@ -45,7 +45,7 @@ namespace TwoTaskWebAPI.Controllers
         public IActionResult Get()
         {
             var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
 
             return Ok(_data.GetAllListsCategories(userId));
         }
@@ -54,7 +54,7 @@ namespace TwoTaskWebAPI.Controllers
         public IActionResult Get(int categoryId)
         {
             var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
 
             return Ok(_data.GetListsCategoryById(categoryId, userId));
         }
@@ -65,7 +65,7 @@ namespace TwoTaskWebAPI.Controllers
             try
             {
                 var currentUser = HttpContext.User;
-                var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+                var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
                 category.UserId = userId;
 
                 _data.UpdateListsCategoryById(categoryId, category, userId);
@@ -82,7 +82,7 @@ namespace TwoTaskWebAPI.Controllers
         public IActionResult Delete(int categoryId)
         {
             var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
             var result = _data.DeleteListsCategoryById(categoryId, userId);
 
             return !result ? (IActionResult)NoContent() : Ok();

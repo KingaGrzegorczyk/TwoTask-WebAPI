@@ -28,7 +28,7 @@ namespace TwoTaskWebAPI.Controllers
             {
                 var currentUser = HttpContext.User;
 
-                region.UserId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+                region.UserId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
                 _data.SaveRegion(region);
 
                 return Ok();
@@ -44,7 +44,7 @@ namespace TwoTaskWebAPI.Controllers
         public IActionResult Get()
         {
             var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
 
             return Ok(_data.GetAllRegions(userId));
         }
@@ -53,7 +53,7 @@ namespace TwoTaskWebAPI.Controllers
         public IActionResult Get(int regionId)
         {
             var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
 
             return Ok(_data.GetRegionById(regionId, userId));
         }
@@ -64,7 +64,7 @@ namespace TwoTaskWebAPI.Controllers
             try
             {
                 var currentUser = HttpContext.User;
-                var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+                var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
                 region.UserId = userId;
 
                 _data.UpdateRegionById(regionId, region, userId);
@@ -81,7 +81,7 @@ namespace TwoTaskWebAPI.Controllers
         public IActionResult Delete(int regionId)
         {
             var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
             var result = _data.DeletegionById(regionId, userId);
 
             return !result ? (IActionResult)NoContent() : Ok();

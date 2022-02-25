@@ -18,12 +18,18 @@ namespace TwoTaskLibrary.Application
         public void Register(UserModel user)
         {
             _sql.SaveData("dbo.spUser_Insert", user, "ConnectionStrings:TwoTaskData");
-        }
-        public void Login(UserModel user)
+        }        
+        public bool CheckIfUserExists(string username)
         {
-            
-            
-            
+            var user = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetByName", new { UserName = username }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            if(user != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

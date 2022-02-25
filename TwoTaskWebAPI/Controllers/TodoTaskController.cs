@@ -28,7 +28,7 @@ namespace TwoTaskWebAPI.Controllers
             {
                 var currentUser = HttpContext.User;
                
-                todoTask.UserId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+                todoTask.UserId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
                 _data.SaveTodoTask(todoTask);
 
                 return Ok();
@@ -44,7 +44,7 @@ namespace TwoTaskWebAPI.Controllers
         public IActionResult Get()
         {
             var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
 
             return Ok(_data.GetAllTodoTasks(userId));
         }
@@ -53,7 +53,7 @@ namespace TwoTaskWebAPI.Controllers
         public IActionResult Get(int taskId)
         {
             var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
 
             return Ok(_data.GetTodoTaskById(taskId, userId));
         }
@@ -64,8 +64,8 @@ namespace TwoTaskWebAPI.Controllers
             try
             {
                 var currentUser = HttpContext.User;
-                var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
-                todoTask.UserId = userId;
+                var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
+               
                _data.UpdateTodoTaskById(taskId, todoTask, userId);
                 return Ok();
             }
@@ -80,7 +80,7 @@ namespace TwoTaskWebAPI.Controllers
         public IActionResult Delete(int taskId)
         {
             var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.FirstOrDefault(c => c.Type == "Id").Value);
+            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
             var result = _data.DeleteTodoTaskById(taskId, userId);
 
             return !result ? (IActionResult)NoContent() : Ok();
