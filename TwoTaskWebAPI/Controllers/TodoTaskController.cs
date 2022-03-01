@@ -13,23 +13,27 @@ namespace TwoTaskWebAPI.Controllers
     public class TodoTaskController : ControllerBase
     {
         private readonly SqlDataAccess _sql;
-        private readonly TodoTaskRepository _data;
+        protected ITodoTaskRepository Data { get; set; }
 
         public TodoTaskController()
         {
             _sql = new SqlDataAccess();
-            _data = new TodoTaskRepository(_sql);
+            Data = new TodoTaskRepository(_sql);
+        }
+
+        [NonAction]
+        public virtual Guid GetCurrentUserId()
+        {
+            return Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value);
         }
 
         [HttpPost]
         public IActionResult Post([FromBody] TodoTaskModel todoTask)
         {
             try
-            {
-                var currentUser = HttpContext.User;
-               
-                todoTask.UserId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-                _data.SaveTodoTask(todoTask);
+            {               
+                todoTask.UserId = GetCurrentUserId();
+                Data.SaveTodoTask(todoTask);
 
                 return Ok();
             }
@@ -38,24 +42,18 @@ namespace TwoTaskWebAPI.Controllers
 
                 return NoContent();
             }
-        }
-
+        }       
+        
         [HttpGet]
         public IActionResult Get()
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-
-            return Ok(_data.GetAllTodoTasks(userId));
+            return Ok(Data.GetAllTodoTasks(GetCurrentUserId()));
         }
 
         [HttpGet("{taskId}")]
         public IActionResult Get(int taskId)
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-
-            return Ok(_data.GetTodoTaskById(taskId, userId));
+            return Ok(Data.GetTodoTaskById(taskId, GetCurrentUserId()));
         }
 
         [HttpPut("{taskId}")]
@@ -63,10 +61,9 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                var currentUser = HttpContext.User;
-                var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-               
-               _data.UpdateTodoTaskById(taskId, todoTask, userId);
+                todoTask.UserId = GetCurrentUserId();
+
+                Data.UpdateTodoTaskById(taskId, todoTask, GetCurrentUserId());
                 return Ok();
             }
             catch(Exception)
@@ -79,9 +76,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{taskId}")]
         public IActionResult Delete(int taskId)
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-            var result = _data.DeleteTodoTaskById(taskId, userId);
+            var result = Data.DeleteTodoTaskById(taskId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

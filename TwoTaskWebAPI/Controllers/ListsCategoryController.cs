@@ -14,12 +14,18 @@ namespace TwoTaskWebAPI.Controllers
     public class ListsCategoryController : ControllerBase
     {
         private readonly SqlDataAccess _sql;
-        private readonly ListsCategoryRepository _data;
+        protected IListsCategoryRepository Data { get; set; }
 
         public ListsCategoryController()
         {
             _sql = new SqlDataAccess();
-            _data = new ListsCategoryRepository(_sql);
+            Data = new ListsCategoryRepository(_sql);
+        }
+
+        [NonAction]
+        public virtual Guid GetCurrentUserId()
+        {
+            return Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value);
         }
 
         [HttpPost]
@@ -27,10 +33,8 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                var currentUser = HttpContext.User;
-
-                category.UserId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-                _data.SaveListsCategory(category);
+                category.UserId = GetCurrentUserId();
+                Data.SaveListsCategory(category);
 
                 return Ok();
             }
@@ -44,19 +48,13 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-
-            return Ok(_data.GetAllListsCategories(userId));
+            return Ok(Data.GetAllListsCategories(GetCurrentUserId()));
         }
 
         [HttpGet("{categoryId}")]
         public IActionResult Get(int categoryId)
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-
-            return Ok(_data.GetListsCategoryById(categoryId, userId));
+            return Ok(Data.GetListsCategoryById(categoryId, GetCurrentUserId()));
         }
 
         [HttpPut("{categoryId}")]
@@ -64,11 +62,9 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                var currentUser = HttpContext.User;
-                var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-                category.UserId = userId;
+                category.UserId = GetCurrentUserId();
 
-                _data.UpdateListsCategoryById(categoryId, category, userId);
+                Data.UpdateListsCategoryById(categoryId, category, GetCurrentUserId());
                 return Ok();
             }
             catch (Exception)
@@ -81,9 +77,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{categoryId}")]
         public IActionResult Delete(int categoryId)
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-            var result = _data.DeleteListsCategoryById(categoryId, userId);
+            var result = Data.DeleteListsCategoryById(categoryId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

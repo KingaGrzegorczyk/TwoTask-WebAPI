@@ -50,7 +50,6 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Login(UserLoginModel userLogin)
         {
-            SqlDataAccess _sql = new SqlDataAccess();
             var users = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetAll", new {  }, "ConnectionStrings:TwoTaskData");
             var Token = new UserToken();
             if (users != null)
@@ -90,7 +89,6 @@ namespace TwoTaskWebAPI.Controllers
         [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult GetAllUsers()
         {
-            SqlDataAccess _sql = new SqlDataAccess();
             var users = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetAll", new { }, "ConnectionStrings:TwoTaskData");
             return Ok(users);
         }

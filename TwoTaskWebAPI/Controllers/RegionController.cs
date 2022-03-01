@@ -13,12 +13,18 @@ namespace TwoTaskWebAPI.Controllers
     public class RegionController : ControllerBase
     {
         private readonly SqlDataAccess _sql;
-        private readonly RegionRepository _data;
+        protected IRegionRepository Data { get; set; }
 
         public RegionController()
         {
             _sql = new SqlDataAccess();
-            _data = new RegionRepository(_sql);
+            Data = new RegionRepository(_sql);
+        }
+
+        [NonAction]
+        public virtual Guid GetCurrentUserId()
+        {
+            return Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value);
         }
 
         [HttpPost]
@@ -26,10 +32,8 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                var currentUser = HttpContext.User;
-
-                region.UserId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-                _data.SaveRegion(region);
+                region.UserId = GetCurrentUserId();
+                Data.SaveRegion(region);
 
                 return Ok();
             }
@@ -43,19 +47,13 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-
-            return Ok(_data.GetAllRegions(userId));
+            return Ok(Data.GetAllRegions(GetCurrentUserId()));
         }
 
         [HttpGet("{regionId}")]
         public IActionResult Get(int regionId)
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-
-            return Ok(_data.GetRegionById(regionId, userId));
+            return Ok(Data.GetRegionById(regionId, GetCurrentUserId()));
         }
 
         [HttpPut("{regionId}")]
@@ -63,11 +61,9 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                var currentUser = HttpContext.User;
-                var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-                region.UserId = userId;
+                region.UserId = GetCurrentUserId();
 
-                _data.UpdateRegionById(regionId, region, userId);
+                Data.UpdateRegionById(regionId, region, GetCurrentUserId());
                 return Ok();
             }
             catch (Exception)
@@ -80,9 +76,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{regionId}")]
         public IActionResult Delete(int regionId)
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-            var result = _data.DeletegionById(regionId, userId);
+            var result = Data.DeletegionById(regionId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

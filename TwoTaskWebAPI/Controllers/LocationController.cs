@@ -14,12 +14,18 @@ namespace TwoTaskWebAPI.Controllers
     public class LocationController : ControllerBase
     {
         private readonly SqlDataAccess _sql;
-        private readonly LocationRepository _data;
+        protected ILocationRepository Data { get; set; }
 
         public LocationController()
         {
             _sql = new SqlDataAccess();
-            _data = new LocationRepository(_sql);
+            Data = new LocationRepository(_sql);
+        }
+
+        [NonAction]
+        public virtual Guid GetCurrentUserId()
+        {
+            return Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value);
         }
 
         [HttpPost]
@@ -27,10 +33,8 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                var currentUser = HttpContext.User;
-
-                location.UserId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-                _data.SaveLocation(location);
+                location.UserId = GetCurrentUserId();
+                Data.SaveLocation(location);
 
                 return Ok();
             }
@@ -44,19 +48,13 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-
-            return Ok(_data.GetAllLocations(userId));
+            return Ok(Data.GetAllLocations(GetCurrentUserId()));
         }
 
         [HttpGet("{locationId}")]
         public IActionResult Get(int locationId)
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-
-            return Ok(_data.GetLocationById(locationId, userId));
+            return Ok(Data.GetLocationById(locationId, GetCurrentUserId()));
         }
 
         [HttpPut("{locationId}")]
@@ -64,11 +62,9 @@ namespace TwoTaskWebAPI.Controllers
         {
             try
             {
-                var currentUser = HttpContext.User;
-                var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-                location.UserId = userId;
+                location.UserId = GetCurrentUserId();
 
-                _data.UpdateLocationById(locationId, location, userId);
+                Data.UpdateLocationById(locationId, location, GetCurrentUserId());
                 return Ok();
             }
             catch (Exception)
@@ -81,9 +77,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{locationId}")]
         public IActionResult Delete(int locationId)
         {
-            var currentUser = HttpContext.User;
-            var userId = Guid.Parse(currentUser.Claims.First(c => c.Type == "Id").Value);
-            var result = _data.DeleteLocationById(locationId, userId);
+            var result = Data.DeleteLocationById(locationId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }
