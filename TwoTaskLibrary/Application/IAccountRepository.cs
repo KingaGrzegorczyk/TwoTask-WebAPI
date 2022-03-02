@@ -11,5 +11,6 @@ namespace TwoTaskLibrary.Application
     {
         void Register(UserModel user);
         bool CheckIfUserExists(string username);
+        List<UserModel> GetAllUsers();
     }
 }

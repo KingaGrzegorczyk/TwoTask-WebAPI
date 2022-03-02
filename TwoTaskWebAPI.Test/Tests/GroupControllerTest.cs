@@ -151,24 +151,26 @@ namespace TwoTaskWebAPI.Test.Tests
             };
 
             //Act
-            var createdResponse = _controller.PostUserIntoGroup(completeUser);
+            var createdResponse = _controller.PostUserIntoGroup(completeUser, completeUser.GroupId, completeUser.UserId);
 
             //Assert
             Assert.IsType<OkResult>(createdResponse);
         }
 
-        //[Fact]
-        //public void PostUserIntoGroupTest_NoContentResult()
-        //{
-        //    //Arrange
-        //    UsersInGroupModel incompleteUser = null;
+        [Fact]
+        public void PostUserIntoGroupTest_NoContentResult()
+        {
+            //Arrange
+            UsersInGroupModel incompleteUser = null;
+            int? groupId = null;
+            Guid? userId = null;
 
-        //    //Act
-        //    var badResponse = _controller.PostUserIntoGroup(incompleteUser);
+            //Act
+            var badResponse = _controller.PostUserIntoGroup(incompleteUser, groupId ?? default(int), userId ?? default(Guid));
 
-        //    //Assert
-        //    Assert.IsType<NoContentResult>(badResponse);
-        //}
+            //Assert
+            Assert.IsType<NoContentResult>(badResponse);
+        }
 
         [Theory]
         [InlineData(3)]

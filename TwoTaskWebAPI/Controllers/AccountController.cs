@@ -16,19 +16,19 @@ namespace TwoTaskWebAPI.Controllers
     {
         private readonly JwtSettings _jwtSettings;
         private readonly SqlDataAccess _sql;
-        private readonly AccountRepository _data;
-        
+        protected IAccountRepository Data { get; set; }
+
         public AccountController(JwtSettings jwtSettings)
         {
             _jwtSettings = jwtSettings;
             _sql = new SqlDataAccess();
-            _data = new AccountRepository(_sql);
+            Data = new AccountRepository(_sql);
         }
 
         [HttpPost]
         public IActionResult Register(UserRegisterModel register)
         {
-            if(_data.CheckIfUserExists(register.Username)) 
+            if(Data.CheckIfUserExists(register.Username)) 
                 return BadRequest("UserName Is Already Taken");
             else
             {
@@ -42,7 +42,7 @@ namespace TwoTaskWebAPI.Controllers
                     Password = hmac.ComputeHash(Encoding.UTF8.GetBytes(register.Password.ToCharArray())),
                     PasswordSalt = hmac.Key
                 };
-                _data.Register(user);
+                Data.Register(user);
                 return Ok();
             }           
         }
@@ -50,7 +50,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Login(UserLoginModel userLogin)
         {
-            var users = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetAll", new {  }, "ConnectionStrings:TwoTaskData");
+            var users = Data.GetAllUsers();
             var Token = new UserToken();
             if (users != null)
             {
@@ -89,8 +89,7 @@ namespace TwoTaskWebAPI.Controllers
         [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult GetAllUsers()
         {
-            var users = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetAll", new { }, "ConnectionStrings:TwoTaskData");
-            return Ok(users);
+            return Ok(Data.GetAllUsers());
         }
     }
 }

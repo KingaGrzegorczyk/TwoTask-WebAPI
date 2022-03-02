@@ -82,10 +82,12 @@ namespace TwoTaskWebAPI.Controllers
         }
 
         [HttpPost("{groupId}/{userId}")]
-        public IActionResult PostUserIntoGroup([FromBody] UsersInGroupModel user)
+        public IActionResult PostUserIntoGroup([FromBody] UsersInGroupModel user, int groupId, Guid userId)
         {
             try
             {
+                user.UserId = userId;
+                user.GroupId = groupId;
                 Data.SaveUserInGroup(user);
 
                 return Ok();

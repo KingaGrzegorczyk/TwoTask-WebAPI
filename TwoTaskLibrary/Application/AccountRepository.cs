@@ -31,5 +31,12 @@ namespace TwoTaskLibrary.Application
                 return false;
             }
         }
+        public List<UserModel> GetAllUsers()
+        {
+            var output = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetAll", new { }, "ConnectionStrings:TwoTaskData");
+
+            return output;
+        }
+      
     }
 }
