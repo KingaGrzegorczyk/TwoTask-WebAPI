@@ -14,11 +14,13 @@ namespace TwoTaskWebAPI.Controllers
     {
         private readonly SqlDataAccess _sql;
         protected IRegionRepository Data { get; set; }
+        private readonly ILogger<RegionRepository> _logger;
 
-        public RegionController()
+        public RegionController(ILogger<RegionRepository> logger)
         {
             _sql = new SqlDataAccess();
-            Data = new RegionRepository(_sql);
+            _logger = logger;
+            Data = new RegionRepository(_sql, _logger);
         }
 
         [NonAction]
@@ -30,18 +32,10 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] RegionModel region)
         {
-            try
-            {
-                region.UserId = GetCurrentUserId();
-                Data.SaveRegion(region);
+            region.UserId = GetCurrentUserId();
+            var result = Data.SaveRegion(region);
 
-                return Ok();
-            }
-            catch (Exception)
-            {
-
-                return NoContent();
-            }
+            return !result ? (IActionResult)NoContent() : Ok();         
         }
 
         [HttpGet]
@@ -59,24 +53,16 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPut("{regionId}")]
         public IActionResult Put(int regionId, [FromBody] RegionModel region)
         {
-            try
-            {
-                region.UserId = GetCurrentUserId();
+            region.UserId = GetCurrentUserId();
+            var result = Data.UpdateRegionById(regionId, region, GetCurrentUserId());
 
-                Data.UpdateRegionById(regionId, region, GetCurrentUserId());
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return NoContent();
-            }
-
+            return !result ? (IActionResult)NoContent() : Ok();
         }
 
         [HttpDelete("{regionId}")]
         public IActionResult Delete(int regionId)
         {
-            var result = Data.DeletegionById(regionId, GetCurrentUserId());
+            var result = Data.RemoveRegionById(regionId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

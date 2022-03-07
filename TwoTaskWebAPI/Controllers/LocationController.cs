@@ -15,11 +15,13 @@ namespace TwoTaskWebAPI.Controllers
     {
         private readonly SqlDataAccess _sql;
         protected ILocationRepository Data { get; set; }
+        private readonly ILogger<LocationRepository> _logger;
 
-        public LocationController()
+        public LocationController(ILogger<LocationRepository> logger)
         {
             _sql = new SqlDataAccess();
-            Data = new LocationRepository(_sql);
+            _logger = logger;
+            Data = new LocationRepository(_sql, _logger);
         }
 
         [NonAction]
@@ -31,18 +33,10 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] LocationModel location)
         {
-            try
-            {
-                location.UserId = GetCurrentUserId();
-                Data.SaveLocation(location);
+            location.UserId = GetCurrentUserId();
+            var result = Data.SaveLocation(location);
 
-                return Ok();
-            }
-            catch (Exception)
-            {
-
-                return NoContent();
-            }
+            return !result ? (IActionResult)NoContent() : Ok();
         }
 
         [HttpGet]
@@ -60,24 +54,16 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPut("{locationId}")]
         public IActionResult Put(int locationId, [FromBody] LocationModel location)
         {
-            try
-            {
-                location.UserId = GetCurrentUserId();
+            location.UserId = GetCurrentUserId();
+            var result = Data.UpdateLocationById(locationId, location, GetCurrentUserId());
 
-                Data.UpdateLocationById(locationId, location, GetCurrentUserId());
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return NoContent();
-            }
-
+            return !result ? (IActionResult)NoContent() : Ok();
         }
 
         [HttpDelete("{locationId}")]
         public IActionResult Delete(int locationId)
         {
-            var result = Data.DeleteLocationById(locationId, GetCurrentUserId());
+            var result = Data.RemoveLocationById(locationId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

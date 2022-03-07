@@ -7,6 +7,7 @@ using TwoTaskLibrary.Internal.DataAccess;
 using System.Security.Cryptography;
 using System.Text;
 using TwoTaskLibrary.Application;
+using TwoTaskWebAPI.Extensions;
 
 namespace TwoTaskWebAPI.Controllers
 {
@@ -17,71 +18,45 @@ namespace TwoTaskWebAPI.Controllers
         private readonly JwtSettings _jwtSettings;
         private readonly SqlDataAccess _sql;
         protected IAccountRepository Data { get; set; }
+        private readonly ILogger<AccountRepository> _logger;
+        private AccountExtension _extension;
 
-        public AccountController(JwtSettings jwtSettings)
+        public AccountController(JwtSettings jwtSettings, ILogger<AccountRepository> logger)
         {
             _jwtSettings = jwtSettings;
             _sql = new SqlDataAccess();
-            Data = new AccountRepository(_sql);
+            _logger = logger;
+            Data = new AccountRepository(_sql, _logger);
+            _extension = new AccountExtension(_jwtSettings, _sql, _logger);
         }
 
         [HttpPost]
         public IActionResult Register(UserRegisterModel register)
         {
-            if(Data.CheckIfUserExists(register.Username)) 
+            if(Data.IsUserNameIsTaken(register.Username)) 
                 return BadRequest("UserName Is Already Taken");
             else
-            {
-                var hmac = new HMACSHA512();
-
-                var user = new UserModel
-                {
-                    Id = Guid.NewGuid(),
-                    UserName = register.Username.ToLower(),
-                    Email = register.Email,
-                    Password = hmac.ComputeHash(Encoding.UTF8.GetBytes(register.Password.ToCharArray())),
-                    PasswordSalt = hmac.Key
-                };
-                Data.Register(user);
-                return Ok();
+            {                
+                var result = Data.Register(register);
+                return !result ? (IActionResult)NoContent() : Ok();
             }           
         }
 
         [HttpPost]
         public IActionResult Login(UserLoginModel userLogin)
         {
-            var users = Data.GetAllUsers();
-            var Token = new UserToken();
-            if (users != null)
+            var user = _extension.IsUserNameFound(userLogin);
+            if (user != null)
             {
-                var user = users.FirstOrDefault(x => x.UserName == userLogin.UserName);
-
-                if (user == null) 
-                    return Unauthorized("Invalid UserName");
-                else
+                if (_extension.IsPasswordValid(userLogin, user))
                 {
-                    var hmac = new HMACSHA512(user.PasswordSalt);
-
-                    var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(userLogin.Password.ToCharArray()));
-
-                    for (int i = 0; i < computedHash.Length; i++)
-                    {
-                        if (computedHash[i] != user.Password[i]) 
-                            return Unauthorized("Invalid Password");
-                    }
-                    Token = JwtHelper.GenTokenkey(new UserToken()
-                    {
-                        Email = user.Email,
-                        UserName = user.UserName,
-                        Id = user.Id,
-                    }, _jwtSettings);
-                    return Ok(Token);
-
-                }            
-                
-            }
+                    return Ok(_extension.GenerateToken(user));
+                }
+                else
+                    return Unauthorized("Bad credentials");
+            }                   
             else
-                return BadRequest($"there is no user");
+                return BadRequest($"User not found");
 
         }
 

@@ -14,11 +14,13 @@ namespace TwoTaskWebAPI.Controllers
     {
         private readonly SqlDataAccess _sql;
         protected ITodoTaskRepository Data { get; set; }
+        private readonly ILogger<TodoTaskRepository> _logger;
 
-        public TodoTaskController()
+        public TodoTaskController(ILogger<TodoTaskRepository> logger)
         {
             _sql = new SqlDataAccess();
-            Data = new TodoTaskRepository(_sql);
+            _logger = logger;
+            Data = new TodoTaskRepository(_sql, _logger);
         }
 
         [NonAction]
@@ -30,18 +32,10 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] TodoTaskModel todoTask)
         {
-            try
-            {               
-                todoTask.UserId = GetCurrentUserId();
-                Data.SaveTodoTask(todoTask);
+            todoTask.UserId = GetCurrentUserId();
+            var result = Data.SaveTodoTask(todoTask);
 
-                return Ok();
-            }
-            catch (Exception)
-            {
-
-                return NoContent();
-            }
+            return !result ? (IActionResult)NoContent() : Ok();
         }       
         
         [HttpGet]
@@ -59,24 +53,16 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPut("{taskId}")]
         public IActionResult Put(int taskId, [FromBody] TodoTaskModel todoTask)
         {
-            try
-            {
-                todoTask.UserId = GetCurrentUserId();
+            todoTask.UserId = GetCurrentUserId();
+            var result = Data.UpdateTodoTaskById(taskId, todoTask, GetCurrentUserId());
 
-                Data.UpdateTodoTaskById(taskId, todoTask, GetCurrentUserId());
-                return Ok();
-            }
-            catch(Exception)
-            {
-                return NoContent();
-            }
-
+            return !result ? (IActionResult)NoContent() : Ok();
         }
         
         [HttpDelete("{taskId}")]
         public IActionResult Delete(int taskId)
         {
-            var result = Data.DeleteTodoTaskById(taskId, GetCurrentUserId());
+            var result = Data.RemoveTodoTaskById(taskId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

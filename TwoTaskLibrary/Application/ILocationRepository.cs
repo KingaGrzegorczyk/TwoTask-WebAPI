@@ -9,10 +9,10 @@ namespace TwoTaskLibrary.Application
 {
     public interface ILocationRepository
     {
-        void SaveLocation(LocationModel location);
-        List<LocationModel> GetAllLocations(Guid userId);
+        bool SaveLocation(LocationModel location);
+        IEnumerable<LocationModel> GetAllLocations(Guid userId);
         LocationModel GetLocationById(int locationId, Guid userId);
-        void UpdateLocationById(int locationId, LocationModel location, Guid userId);
-        bool DeleteLocationById(int locationId, Guid userId);
+        bool UpdateLocationById(int locationId, LocationModel location, Guid userId);
+        bool RemoveLocationById(int locationId, Guid userId);
     }
 }

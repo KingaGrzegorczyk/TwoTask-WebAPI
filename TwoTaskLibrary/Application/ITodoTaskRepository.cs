@@ -9,10 +9,10 @@ namespace TwoTaskLibrary.Application
 {
     public interface ITodoTaskRepository
     {
-        void SaveTodoTask(TodoTaskModel todoTask);
-        List<TodoTaskModel> GetAllTodoTasks(Guid userId);
+        bool SaveTodoTask(TodoTaskModel todoTask);
+        IEnumerable<TodoTaskModel> GetAllTodoTasks(Guid userId);
         TodoTaskModel GetTodoTaskById(int taskId, Guid userId);
-        void UpdateTodoTaskById(int taskId, TodoTaskModel todoTask, Guid userId);
-        bool DeleteTodoTaskById(int taskId, Guid userId);
+        bool UpdateTodoTaskById(int taskId, TodoTaskModel todoTask, Guid userId);
+        bool RemoveTodoTaskById(int taskId, Guid userId);
     }
 }

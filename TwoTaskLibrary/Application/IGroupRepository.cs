@@ -9,13 +9,13 @@ namespace TwoTaskLibrary.Application
 {
     public interface IGroupRepository
     {
-        void SaveGroup(GroupModel group);
-        List<GroupModel> GetAllGroups(Guid userId);
+        bool SaveGroup(GroupModel group);
+        IEnumerable<GroupModel> GetAllGroups(Guid userId);
         GroupModel GetGroupById(int groupId);
-        void UpdateGroupById(int groupId, GroupModel group, Guid userId);
-        bool DeleteGroupById(int groupId, Guid userId);
-        void SaveUserInGroup(UsersInGroupModel userInGroup);
-        List<UsersInGroupModel> GetAllUsersInGroup(int groupId);
-        bool DeleteUserFromGroup(int groupId, Guid userId);
+        bool UpdateGroupById(int groupId, GroupModel group, Guid userId);
+        bool RemoveGroupById(int groupId, Guid userId);
+        bool SaveUserInGroup(UsersInGroupModel userInGroup);
+        IEnumerable<UsersInGroupModel> GetAllUsersInGroup(int groupId);
+        bool RemoveUserFromGroup(int groupId, Guid userId);
     }
 }

@@ -9,10 +9,10 @@ namespace TwoTaskLibrary.Application
 {
     public interface IRegionRepository
     {
-        void SaveRegion(RegionModel region);
-        List<RegionModel> GetAllRegions(Guid userId);
+        bool SaveRegion(RegionModel region);
+        IEnumerable<RegionModel> GetAllRegions(Guid userId);
         RegionModel GetRegionById(int regionId, Guid userId);
-        void UpdateRegionById(int regionId, RegionModel region, Guid userId);
-        bool DeletegionById(int regionId, Guid userId);
+        bool UpdateRegionById(int regionId, RegionModel region, Guid userId);
+        bool RemoveRegionById(int regionId, Guid userId);
     }
 }

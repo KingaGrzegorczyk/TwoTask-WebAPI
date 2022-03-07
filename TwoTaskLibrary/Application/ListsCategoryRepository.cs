@@ -1,54 +1,72 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
+using TwoTaskLibrary.Services;
 
 namespace TwoTaskLibrary.Application
 {
     public class ListsCategoryRepository : IListsCategoryRepository
     {
         private readonly SqlDataAccess _sql;
+        private readonly ListsCategoryService _service;
+        private readonly ILogger<ListsCategoryRepository> _logger;
 
-        public ListsCategoryRepository(SqlDataAccess sql)
+        public ListsCategoryRepository(SqlDataAccess sql, ILogger<ListsCategoryRepository> logger)
         {
             _sql = sql;
+            _service = new ListsCategoryService(_sql);
+            _logger = logger;
         }
-        public void SaveListsCategory(ListsCategoryModel category)
+        public bool SaveListsCategory(ListsCategoryModel category)
         {
-            _sql.SaveData("dbo.spListsCategory_Insert", category, "ConnectionStrings:TwoTaskData");
+            try
+            {
+                _sql.SaveData("dbo.spListsCategory_Insert", category, "ConnectionStrings:TwoTaskData");
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            
         }
-        public List<ListsCategoryModel> GetAllListsCategories(Guid userId)
+        public IEnumerable<ListsCategoryModel> GetAllListsCategories(Guid userId)
         {
-            var output = _sql.LoadData<ListsCategoryModel, dynamic>("dbo.spListsCategory_GetAll", new { UserId = userId }, "ConnectionStrings:TwoTaskData");
+            var output = _sql.LoadData<ListsCategoryModel, object>("dbo.spListsCategory_GetAll", new { UserId = userId }, "ConnectionStrings:TwoTaskData");
 
             return output;
         }
         public ListsCategoryModel GetListsCategoryById(int categoryId, Guid userId)
         {
-            var output = _sql.LoadData<ListsCategoryModel, dynamic>("dbo.spListsCategory_GetById", new { Id = categoryId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var output = _sql.LoadData<ListsCategoryModel, object>("dbo.spListsCategory_GetById", new { Id = categoryId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
 
             return output;
         }
-        public void UpdateListsCategoryById(int categoryId, ListsCategoryModel category, Guid userId)
+        public bool UpdateListsCategoryById(int categoryId, ListsCategoryModel category, Guid userId)
         {
-            var categoryToUpdate = _sql.LoadData<ListsCategoryModel, dynamic>("dbo.spListsCategory_GetById", new { Id = categoryId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
-            if (categoryToUpdate != null)
+            if (!_service.IsListsCategoryExists(categoryId, userId))
             {
-                _sql.UpdateData("dbo.spListsCategory_UpdateById", category, "ConnectionStrings:TwoTaskData");
+                _logger.LogWarning("Category not found");
+                return false;
             }
             else
             {
-                throw new Exception("Category not found");
-            }
+                _sql.UpdateData("dbo.spListsCategory_UpdateById", category, "ConnectionStrings:TwoTaskData");
+                return true;
+            }          
         }
-        public bool DeleteListsCategoryById(int categoryId, Guid userId)
+        public bool RemoveListsCategoryById(int categoryId, Guid userId)
         {
-            var categoryToDelete = _sql.LoadData<ListsCategoryModel, dynamic>("dbo.spListsCategory_GetById", new { Id = categoryId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
-            if (categoryToDelete == null)
+            if (!_service.IsListsCategoryExists(categoryId, userId))
+            {
+                _logger.LogWarning("Category not found");
                 return false;
+            }
             else
             {
                 _sql.DeleteData("dbo.spListsCategory_DeleteById", new { Id = categoryId, UserId = userId }, "ConnectionStrings:TwoTaskData");

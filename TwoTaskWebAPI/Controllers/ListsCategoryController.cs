@@ -15,11 +15,13 @@ namespace TwoTaskWebAPI.Controllers
     {
         private readonly SqlDataAccess _sql;
         protected IListsCategoryRepository Data { get; set; }
+        private readonly ILogger<ListsCategoryRepository> _logger;
 
-        public ListsCategoryController()
+        public ListsCategoryController(ILogger<ListsCategoryRepository> logger)
         {
             _sql = new SqlDataAccess();
-            Data = new ListsCategoryRepository(_sql);
+            _logger = logger;
+            Data = new ListsCategoryRepository(_sql, _logger);
         }
 
         [NonAction]
@@ -31,18 +33,10 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] ListsCategoryModel category)
         {
-            try
-            {
-                category.UserId = GetCurrentUserId();
-                Data.SaveListsCategory(category);
+            category.UserId = GetCurrentUserId();
+            var result = Data.SaveListsCategory(category);
 
-                return Ok();
-            }
-            catch (Exception)
-            {
-
-                return NoContent();
-            }
+            return !result ? (IActionResult)NoContent() : Ok();           
         }
 
         [HttpGet]
@@ -60,24 +54,16 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPut("{categoryId}")]
         public IActionResult Put(int categoryId, [FromBody] ListsCategoryModel category)
         {
-            try
-            {
-                category.UserId = GetCurrentUserId();
+            category.UserId = GetCurrentUserId();
+            var result = Data.UpdateListsCategoryById(categoryId, category, GetCurrentUserId());
 
-                Data.UpdateListsCategoryById(categoryId, category, GetCurrentUserId());
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return NoContent();
-            }
-
+            return !result ? (IActionResult)NoContent() : Ok();           
         }
 
         [HttpDelete("{categoryId}")]
         public IActionResult Delete(int categoryId)
         {
-            var result = Data.DeleteListsCategoryById(categoryId, GetCurrentUserId());
+            var result = Data.RemoveListsCategoryById(categoryId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

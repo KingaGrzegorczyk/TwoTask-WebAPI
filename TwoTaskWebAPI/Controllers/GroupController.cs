@@ -10,38 +10,26 @@ namespace TwoTaskWebAPI.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
-    public class GroupController : ControllerBase
+    public partial class GroupController : ControllerBase
     {
         private readonly SqlDataAccess _sql;
         protected IGroupRepository Data { get; set; }
+        private readonly ILogger<GroupRepository> _logger;
 
-        public GroupController()
+        public GroupController(ILogger<GroupRepository> logger)
         {
             _sql = new SqlDataAccess();
-            Data = new GroupRepository(_sql);
-        }
-
-        [NonAction]
-        public virtual Guid GetCurrentUserId()
-        {
-            return Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value);
+            _logger = logger;
+            Data = new GroupRepository(_sql, _logger);
         }
 
         [HttpPost]
         public IActionResult Post([FromBody] GroupModel group)
         {
-            try
-            {
-                group.OwnerId = GetCurrentUserId();
-                Data.SaveGroup(group);
+            group.OwnerId = GetCurrentUserId();
+            var result = Data.SaveGroup(group);
 
-                return Ok();
-            }
-            catch (Exception)
-            {
-
-                return NoContent();
-            }
+            return !result ? (IActionResult)NoContent() : Ok();
         }
 
         [HttpGet]
@@ -59,24 +47,15 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPut("{groupId}")]
         public IActionResult Put(int groupId, [FromBody] GroupModel group)
         {
-            try
-            {
-                group.OwnerId = GetCurrentUserId();
+            var result = Data.UpdateGroupById(groupId, group, GetCurrentUserId());
 
-                Data.UpdateGroupById(groupId, group, GetCurrentUserId());
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return NoContent();
-            }
-
+            return !result ? (IActionResult)NoContent() : Ok();           
         }
 
         [HttpDelete("{groupId}")]
         public IActionResult Delete(int groupId)
         {
-            var result = Data.DeleteGroupById(groupId, GetCurrentUserId());
+            var result = Data.RemoveGroupById(groupId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }
@@ -84,19 +63,12 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost("{groupId}/{userId}")]
         public IActionResult PostUserIntoGroup([FromBody] UsersInGroupModel user, int groupId, Guid userId)
         {
-            try
-            {
-                user.UserId = userId;
-                user.GroupId = groupId;
-                Data.SaveUserInGroup(user);
+            user.UserId = userId;
+            user.GroupId = groupId;
+            
+            var result = Data.SaveUserInGroup(user);
 
-                return Ok();
-            }
-            catch (Exception)
-            {
-
-                return NoContent();
-            }
+            return !result ? (IActionResult)NoContent() : Ok();           
         }
 
         [HttpGet("GetUsers/{groupId}")]
@@ -108,7 +80,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{groupId}/{userId}")]
         public IActionResult DeleteUserFromGroup(int groupId, Guid userId)
         {
-            var result = Data.DeleteUserFromGroup(groupId, userId);
+            var result = Data.RemoveUserFromGroup(groupId, userId);
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

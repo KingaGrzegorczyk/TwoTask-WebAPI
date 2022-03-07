@@ -9,8 +9,8 @@ namespace TwoTaskLibrary.Application
 {
     public interface IAccountRepository
     {
-        void Register(UserModel user);
-        bool CheckIfUserExists(string username);
-        List<UserModel> GetAllUsers();
+        bool Register(UserRegisterModel register);
+        bool IsUserNameIsTaken(string username);
+        IEnumerable<UserModel> GetAllUsers();
     }
 }
