@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using TwoTaskWebAPI.Extensions;
 using TwoTaskLibrary.Application;
 using TwoTaskLibrary.Services;
@@ -51,6 +54,7 @@ builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IRegionService, RegionService>();
 builder.Services.AddScoped<ITodoTaskService, TodoTaskService>();
 builder.Services.AddScoped<ITodoTasksListService, TodoTasksListService>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
 
 
 var app = builder.Build();

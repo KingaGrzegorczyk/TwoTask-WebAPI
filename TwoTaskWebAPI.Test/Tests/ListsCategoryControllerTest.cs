@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TwoTaskLibrary.Application;
-using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 using Xunit;
 

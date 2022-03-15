@@ -5,6 +5,7 @@ using TwoTaskLibrary.Models;
 using TwoTaskWebAPI.JwtHelpers;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using TwoTaskLibrary.Application;
 using TwoTaskWebAPI.Extensions;
 using TwoTaskLibrary.Services;

@@ -18,31 +18,31 @@ namespace TwoTaskLibrary.Services
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _accountRepository;
+        private readonly ISecurityService _securityService;
 
-        public AccountService(IAccountRepository accountRepository)
+        public AccountService(IAccountRepository accountRepository, ISecurityService securityService)
         {
             _accountRepository = accountRepository;
+            _securityService = securityService;
         }
         public UserModel RegisterUser(UserRegisterModel register)
         {
             if (_accountRepository.IsUserNameIsTaken(register.Username))
                 return null;
 
-            var hmac = new HMACSHA512();
 
             var user = new UserModel
             {
                 Id = Guid.NewGuid(),
                 UserName = register.Username.ToLower(),
                 Email = register.Email,
-                Password = hmac.ComputeHash(Encoding.UTF8.GetBytes(register.Password.ToCharArray())),
-                PasswordSalt = hmac.Key
+                Password = _securityService.ComputeHash(register.Password),
+                PasswordSalt = _securityService.GetKey()
             };
 
-            _accountRepository.Register(register); 
+            var result = _accountRepository.Register(register);
 
-
-            return user;
+            return !result ? null : user;
         }
 
         public IEnumerable<UserModel> GetAllUsers()
