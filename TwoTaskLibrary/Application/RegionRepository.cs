@@ -10,11 +10,20 @@ using TwoTaskLibrary.Services;
 
 namespace TwoTaskLibrary.Application
 {
+    public interface IRegionRepository
+    {
+        bool IsRegionExists(int regionId, Guid userId);
+        bool SaveRegion(RegionModel region);
+        IEnumerable<RegionModel> GetAllRegions(Guid userId);
+        RegionModel GetRegionById(int regionId, Guid userId);
+        bool UpdateRegionById(int regionId, RegionModel region, Guid userId);
+        bool RemoveRegionById(int regionId, Guid userId);
+    }
     public class RegionRepository : IRegionRepository
     {
-        private readonly ISqlDataFactory _sqlDataFactory;
+        private readonly SqlDataFactory _sqlDataFactory;
 
-        public RegionRepository(ISqlDataFactory sqlDataFactory)
+        public RegionRepository(SqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

@@ -150,19 +150,12 @@
   <ItemGroup>
     <Compile Include="Application\AccountRepository.cs" />
     <Compile Include="Application\GroupRepository.cs" />
-    <Compile Include="Application\IAccountRepository.cs" />
-    <Compile Include="Application\IGroupRepository.cs" />
-    <Compile Include="Application\IListsCategoryRepository.cs" />
-    <Compile Include="Application\ILocationRepository.cs" />
-    <Compile Include="Application\IRegionRepository.cs" />
-    <Compile Include="Application\ITodoTaskRepository.cs" />
-    <Compile Include="Application\ITodoTasksListRepository.cs" />
     <Compile Include="Application\ListsCategoryRepository.cs" />
     <Compile Include="Application\LocationRepository.cs" />
     <Compile Include="Application\RegionRepository.cs" />
     <Compile Include="Application\TodoTaskRepository.cs" />
     <Compile Include="Application\TodoTasksListRepository.cs" />
-    <Compile Include="Internal\DataAccess\ISqlDataFactory.cs" />
+    <Compile Include="Internal\DataAccess\SqlDataFactory.cs" />
     <Compile Include="Models\GroupModel.cs" />
     <Compile Include="Models\ListsCategoryModel.cs" />
     <Compile Include="Models\LocationModel.cs" />

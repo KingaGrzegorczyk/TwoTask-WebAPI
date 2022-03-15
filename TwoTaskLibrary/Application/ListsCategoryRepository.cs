@@ -10,11 +10,20 @@ using TwoTaskLibrary.Services;
 
 namespace TwoTaskLibrary.Application
 {
+    public interface IListsCategoryRepository
+    {
+        bool IsListsCategoryExists(int categoryId, Guid userId);
+        bool SaveListsCategory(ListsCategoryModel category);
+        IEnumerable<ListsCategoryModel> GetAllListsCategories(Guid userId);
+        ListsCategoryModel GetListsCategoryById(int categoryId, Guid userId);
+        bool UpdateListsCategoryById(int categoryId, ListsCategoryModel category, Guid userId);
+        bool RemoveListsCategoryById(int categoryId, Guid userId);
+    }
     public class ListsCategoryRepository : IListsCategoryRepository
     {
-        private readonly ISqlDataFactory _sqlDataFactory;
+        private readonly SqlDataFactory _sqlDataFactory;
 
-        public ListsCategoryRepository(ISqlDataFactory sqlDataFactory)
+        public ListsCategoryRepository(SqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

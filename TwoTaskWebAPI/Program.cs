@@ -36,7 +36,7 @@ builder.Services.AddSwaggerGen(options => {
     });
 });
 
-string dbConnectionString= builder.Configuration["ConnectionStrings:TwoTaskData"];
+string dbConnectionString = builder.Configuration["ConnectionStrings:TwoTaskData"];
 
 
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
@@ -46,7 +46,7 @@ builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<ITodoTaskRepository, TodoTaskRepository>();
 builder.Services.AddScoped<ITodoTasksListRepository, TodoTasksListRepository>();
-builder.Services.AddScoped<ISqlDataFactory>(x => new SqlDataFactory(dbConnectionString));
+builder.Services.AddScoped<SqlDataFactory>(x => new SqlDataFactory(dbConnectionString));
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IListsCategoryService, ListsCategoryService>();

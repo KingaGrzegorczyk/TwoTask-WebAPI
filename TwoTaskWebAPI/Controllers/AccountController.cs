@@ -20,9 +20,9 @@ namespace TwoTaskWebAPI.Controllers
         private readonly IAccountService _accountService;
         private readonly ILogger<AccountController> _logger;
         private readonly AccountExtension _extension;
-        private readonly ISqlDataFactory _sqlDataFactory;
+        private readonly SqlDataFactory _sqlDataFactory;
 
-        public AccountController(JwtSettings jwtSettings, ILogger<AccountController> logger, ISqlDataFactory sqlDataFactory, IAccountService accountService)
+        public AccountController(JwtSettings jwtSettings, ILogger<AccountController> logger, SqlDataFactory sqlDataFactory, IAccountService accountService)
         {
             _jwtSettings = jwtSettings;
             _logger = logger;

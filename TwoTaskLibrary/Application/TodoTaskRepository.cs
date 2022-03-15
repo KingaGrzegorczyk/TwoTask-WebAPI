@@ -12,11 +12,20 @@ using TwoTaskLibrary.Services;
 
 namespace TwoTaskLibrary.Application
 {
+    public interface ITodoTaskRepository
+    {
+        bool IsTodoTaskExists(int taskId, Guid userId);
+        bool SaveTodoTask(TodoTaskModel todoTask);
+        IEnumerable<TodoTaskModel> GetAllTodoTasks(Guid userId);
+        TodoTaskModel GetTodoTaskById(int taskId, Guid userId);
+        bool UpdateTodoTaskById(int taskId, TodoTaskModel todoTask, Guid userId);
+        bool RemoveTodoTaskById(int taskId, Guid userId);
+    }
     public class TodoTaskRepository : ITodoTaskRepository
     {
-        private readonly ISqlDataFactory _sqlDataFactory;
+        private readonly SqlDataFactory _sqlDataFactory;
 
-        public TodoTaskRepository(ISqlDataFactory sqlDataFactory)
+        public TodoTaskRepository(SqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

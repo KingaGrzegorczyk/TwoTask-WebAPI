@@ -36,7 +36,6 @@ namespace TwoTaskWebAPI.Test
             var result = _accountService.RegisterUser(model);
             
             Assert.Null(result);
-
         }
 
         [Fact]
@@ -57,7 +56,22 @@ namespace TwoTaskWebAPI.Test
             finalModel.Id = result.Id;
             
             Assert.Equal(JsonConvert.SerializeObject(finalModel), JsonConvert.SerializeObject(result));
+        }
 
+        [Fact]
+        public void RegisterUser_False()
+        {
+            this._accountRepository.Setup(x => x.IsUserNameIsTaken(It.IsAny<string>())).Returns(false);
+
+            UserRegisterModel model = new UserRegisterModel()
+            { Email = "test@test.com", Password = "12345", Username = "testUsername" };
+
+            var finalModel = new UserModel();
+
+            var result = _accountService.RegisterUser(model);
+            finalModel.Id = result.Id;
+
+            Assert.NotEqual(JsonConvert.SerializeObject(finalModel), JsonConvert.SerializeObject(result));
         }
     }
 }

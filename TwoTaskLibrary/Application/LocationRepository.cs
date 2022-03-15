@@ -10,11 +10,20 @@ using TwoTaskLibrary.Services;
 
 namespace TwoTaskLibrary.Application
 {
+    public interface ILocationRepository
+    {
+        bool IsLocationExists(int locationId, Guid userId);
+        bool SaveLocation(LocationModel location);
+        IEnumerable<LocationModel> GetAllLocations(Guid userId);
+        LocationModel GetLocationById(int locationId, Guid userId);
+        bool UpdateLocationById(int locationId, LocationModel location, Guid userId);
+        bool RemoveLocationById(int locationId, Guid userId);
+    }
     public class LocationRepository : ILocationRepository
     {
-        private readonly ISqlDataFactory _sqlDataFactory;
+        private readonly SqlDataFactory _sqlDataFactory;
 
-        public LocationRepository(ISqlDataFactory sqlDataFactory)
+        public LocationRepository(SqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

@@ -10,10 +10,16 @@ using TwoTaskLibrary.Services;
 
 namespace TwoTaskLibrary.Application
 {
+    public interface IAccountRepository
+    {
+        bool Register(UserRegisterModel register);
+        bool IsUserNameIsTaken(string username);
+        IEnumerable<UserModel> GetAllUsers();
+    }
     public class AccountRepository : IAccountRepository
     {
-        private readonly ISqlDataFactory _sqlDataFactory;
-        public AccountRepository(ISqlDataFactory sqlDataFactory)
+        private readonly SqlDataFactory _sqlDataFactory;
+        public AccountRepository(SqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

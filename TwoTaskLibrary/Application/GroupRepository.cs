@@ -10,11 +10,24 @@ using Dapper;
 
 namespace TwoTaskLibrary.Application
 {
+    public interface IGroupRepository
+    {
+        bool IsGroupExists(int groupId);
+        int? GetUserInGroupId(int groupId, Guid userId);
+        bool SaveGroup(GroupModel group);
+        IEnumerable<GroupModel> GetAllGroups(Guid userId);
+        GroupModel GetGroupById(int groupId);
+        bool UpdateGroupById(int groupId, GroupModel group, Guid userId);
+        bool RemoveGroupById(int groupId, Guid userId);
+        bool SaveUserInGroup(UsersInGroupModel userInGroup);
+        IEnumerable<UsersInGroupModel> GetAllUsersInGroup(int groupId);
+        bool RemoveUserFromGroup(int groupId, Guid userId);
+    }
     public class GroupRepository : IGroupRepository
     {
-        private readonly ISqlDataFactory _sqlDataFactory;
+        private readonly SqlDataFactory _sqlDataFactory;
 
-        public GroupRepository(ISqlDataFactory sqlDataFactory)
+        public GroupRepository(SqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }
@@ -54,7 +67,7 @@ namespace TwoTaskLibrary.Application
         {
             var connection = _sqlDataFactory.GetOpenConnection();
 
-            var sql = "	SELECT Id, [Name], OwnerId FROM[dbo].[Group] WHERE OwnerId = @UserId ORDER BY Id; ";
+            var sql = "	SELECT Id, [Name], OwnerId FROM[dbo].[Group] WHERE OwnerId = @OwnerId ORDER BY Id; ";
 
             var groups = connection.Query<GroupModel>(sql, new { OwnerId = userId });
 
@@ -84,7 +97,7 @@ namespace TwoTaskLibrary.Application
         {
             var connection = _sqlDataFactory.GetOpenConnection();
 
-            var sql = "	DELETE FROM dbo.[Group] WHERE Id = @Id AND OwnerId = @UserId; ";
+            var sql = "	DELETE FROM dbo.[Group] WHERE Id = @Id AND OwnerId = @OwnerId; ";
 
             connection.Execute(sql, new { Id = groupId, OwnerId = userId });
 

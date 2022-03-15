@@ -10,11 +10,20 @@ using TwoTaskLibrary.Services;
 
 namespace TwoTaskLibrary.Application
 {
+    public interface ITodoTasksListRepository
+    {
+        bool IsTodoTasksListExists(int listId, Guid userId);
+        bool SaveTodoTasksList(TodoTasksListModel list);
+        IEnumerable<TodoTasksListModel> GetAllTodoTasksLists(Guid userId);
+        TodoTasksListModel GetTodoTasksListById(int listId, Guid userId);
+        bool UpdateTodoTasksListById(int listId, TodoTasksListModel list, Guid userId);
+        bool RemoveTodoTasksListById(int listId, Guid userId);
+    }
     public class TodoTasksListRepository : ITodoTasksListRepository 
     {
-        private readonly ISqlDataFactory _sqlDataFactory;
+        private readonly SqlDataFactory _sqlDataFactory;
 
-        public TodoTasksListRepository(ISqlDataFactory sqlDataFactory)
+        public TodoTasksListRepository(SqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

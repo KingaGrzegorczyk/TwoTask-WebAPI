@@ -4,6 +4,11 @@ using System.Text;
 
 namespace TwoTaskLibrary.Services
 {
+    public interface ISecurityService
+    {
+        byte[] ComputeHash(string passwordToCompute);
+        byte[] GetKey();
+    }
     public class SecurityService : ISecurityService
     {
         private static readonly HMACSHA512 Hmac = new HMACSHA512();
@@ -17,11 +22,5 @@ namespace TwoTaskLibrary.Services
         {
             return Hmac.Key;
         }
-    }
-
-    public interface ISecurityService
-    {
-        byte[] ComputeHash(string passwordToCompute);
-        byte[] GetKey();
     }
 }
