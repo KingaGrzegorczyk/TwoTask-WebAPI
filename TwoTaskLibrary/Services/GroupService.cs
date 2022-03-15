@@ -4,43 +4,77 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using TwoTaskLibrary.Application;
 using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 
 namespace TwoTaskLibrary.Services
 {
-    public class GroupService
+    public interface IGroupService
     {
-        private readonly SqlDataAccess _sql;
+        bool SaveGroup(GroupModel group);
+        IEnumerable<GroupModel> GetAllGroups(Guid userId);
+        GroupModel GetGroupById(int groupId);
+        bool UpdateGroupById(int groupId, GroupModel group, Guid userId);
+        bool RemoveGroupById(int groupId, Guid userId);
+        bool SaveUserInGroup(UsersInGroupModel userInGroup);
+        IEnumerable<UsersInGroupModel> GetAllUsersInGroup(int groupId);
+        bool RemoveUserFromGroup(int groupId, Guid userId);
+    }
+    public class GroupService : IGroupService
+    {
+        private readonly IGroupRepository _groupRepository;
 
-        public GroupService(SqlDataAccess sql)
+        public GroupService(IGroupRepository groupRepository)
         {
-            _sql = sql;
+            _groupRepository = groupRepository;
         }
-        public bool IsGroupExists(int groupId)
+        public bool SaveGroup(GroupModel group)
         {
-            var group = _sql.LoadData<GroupModel, object>("dbo.spGroup_GetById", new { Id = groupId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
-            if (group != null)
-            {
-                return true;
-            }
+            return _groupRepository.SaveGroup(group);
+        }
+        public IEnumerable<GroupModel> GetAllGroups(Guid userId)
+        {
+            return _groupRepository.GetAllGroups(userId);
+        }
+
+        public GroupModel GetGroupById(int groupId)
+        {
+            return _groupRepository.GetGroupById(groupId);
+        }
+
+        public bool UpdateGroupById(int groupId, GroupModel group, Guid userId)
+        {
+            if (_groupRepository.IsGroupExists(groupId))
+                return _groupRepository.UpdateGroupById(groupId, group, userId);
             else
-            {
                 return false;
-            }
         }
 
-        public int? GetUserInGroupId(int groupId, Guid userId)
+        public bool RemoveGroupById(int groupId, Guid userId)
         {
-            var userInGroup = _sql.LoadData<GroupModel, object>("dbo.spUsersInGroup_GetById", new { GroupId = groupId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault(); 
-            if (userInGroup != null)
-            {
-                return userInGroup.Id;
-            }
+            if (_groupRepository.IsGroupExists(groupId))
+                return _groupRepository.RemoveGroupById(groupId, userId);
             else
-            {
-                return null;
-            }
+                return false;
+        }
+
+        public bool SaveUserInGroup(UsersInGroupModel userInGroup)
+        {
+            return _groupRepository.SaveUserInGroup(userInGroup);
+        }
+
+        public IEnumerable<UsersInGroupModel> GetAllUsersInGroup(int groupId)
+        {
+            return _groupRepository.GetAllUsersInGroup(groupId);
+        }
+
+        public bool RemoveUserFromGroup(int groupId, Guid userId)
+        {
+            if(_groupRepository.GetUserInGroupId(groupId, userId) != null)
+                return _groupRepository.RemoveUserFromGroup(groupId, userId);
+            else
+                return false;
         }
     }
 }

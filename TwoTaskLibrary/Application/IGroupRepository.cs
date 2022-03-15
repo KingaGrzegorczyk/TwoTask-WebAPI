@@ -9,6 +9,8 @@ namespace TwoTaskLibrary.Application
 {
     public interface IGroupRepository
     {
+        bool IsGroupExists(int groupId);
+        int? GetUserInGroupId(int groupId, Guid userId);
         bool SaveGroup(GroupModel group);
         IEnumerable<GroupModel> GetAllGroups(Guid userId);
         GroupModel GetGroupById(int groupId);

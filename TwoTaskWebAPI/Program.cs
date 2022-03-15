@@ -1,4 +1,7 @@
 using TwoTaskWebAPI.Extensions;
+using TwoTaskLibrary.Application;
+using TwoTaskLibrary.Internal.DataAccess;
+using TwoTaskLibrary.Services;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -31,6 +34,20 @@ builder.Services.AddSwaggerGen(options => {
     });
 });
 
+string dbConnectionString= builder.Configuration["ConnectionStrings:TwoTaskData"];
+
+
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IGroupRepository, GroupRepository>();
+builder.Services.AddScoped<IListsCategoryRepository, ListsCategoryRepository>();
+builder.Services.AddScoped<ILocationRepository, LocationRepository>();
+builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+builder.Services.AddScoped<ITodoTaskRepository, TodoTaskRepository>();
+builder.Services.AddScoped<ITodoTasksListRepository, TodoTasksListRepository>();
+builder.Services.AddScoped<ISqlDataFactory>(x => new SqlDataFactory(dbConnectionString));
+builder.Services.AddScoped<IAccountService, AccountService>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -39,6 +56,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
 
 app.UseHttpsRedirection();
 

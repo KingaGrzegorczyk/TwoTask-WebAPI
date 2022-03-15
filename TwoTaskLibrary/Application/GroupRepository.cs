@@ -7,104 +7,119 @@ using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 using Microsoft.Extensions.Logging;
 using TwoTaskLibrary.Services;
+using Dapper;
 
 namespace TwoTaskLibrary.Application
 {
     public class GroupRepository : IGroupRepository
     {
-        private readonly SqlDataAccess _sql;
-        private readonly GroupService _service;
-        private readonly ILogger<GroupRepository> _logger;
+        private readonly ISqlDataFactory _sqlDataFactory;
 
-        public GroupRepository(SqlDataAccess sql, ILogger<GroupRepository> logger)
+        public GroupRepository(ISqlDataFactory sqlDataFactory)
         {
-            _sql = sql; 
-            _service = new GroupService(_sql);
-            _logger = logger;
+            _sqlDataFactory = sqlDataFactory;
+        }
+
+        public bool IsGroupExists(int groupId)
+        {
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	SELECT Id, [Name], OwnerId FROM[dbo].[Group] WHERE Id = @Id; ";
+
+            var group = connection.Query<GroupModel>(sql, new { Id = groupId });
+
+            return group != null;
+        }
+
+        public int? GetUserInGroupId(int groupId, Guid userId)
+        {
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	SELECT Id FROM[dbo].[Group] WHERE GroupId = @GroupId AND UserId = @UserId; ";
+
+            var id = connection.Query<int>(sql, new { GroupId = groupId, UserId = userId }).Single();
+
+            return id;
         }
         public bool SaveGroup(GroupModel group)
         {
-            try
-            {
-                _sql.SaveData("dbo.spGroup_Insert", group, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-   
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	INSERT INTO dbo.[Group]([Name], OwnerId) VALUES(@Name, @OwnerId); ";
+
+            connection.Execute(sql, new { Name = group.Name, OwnerId = group.OwnerId });
+
+            return true;  
         }
         public IEnumerable<GroupModel> GetAllGroups(Guid userId)
         {
-            var output = _sql.LoadData<GroupModel, object>("dbo.spGroup_GetAll", new { UserId = userId }, "ConnectionStrings:TwoTaskData");
+            var connection = _sqlDataFactory.GetOpenConnection();
 
-            return output;
+            var sql = "	SELECT Id, [Name], OwnerId FROM[dbo].[Group] WHERE OwnerId = @UserId ORDER BY Id; ";
+
+            var groups = connection.Query<GroupModel>(sql, new { OwnerId = userId });
+
+            return groups;
         }
         public GroupModel GetGroupById(int groupId)
         {
-            var output = _sql.LoadData<GroupModel, object>("dbo.spGroup_GetById", new { Id = groupId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var connection = _sqlDataFactory.GetOpenConnection();
 
-            return output;
+            var sql = "	SELECT Id, [Name], OwnerId FROM[dbo].[Group] WHERE Id = @Id; ";
+
+            var group = connection.Query<GroupModel>(sql, new { Id = groupId }).Single();
+
+            return group;
         }
         public bool UpdateGroupById(int groupId, GroupModel group, Guid userId)
         {
-            if (!_service.IsGroupExists(groupId))
-            {
-                _logger.LogWarning("Group not found");
-                return false;
-            }
-            else
-            {
-                _sql.UpdateData("dbo.spGroup_UpdateById", group, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	UPDATE dbo.[Group] SET[Name] = @Name, OwnerId = @OwnerId WHERE Id = @Id AND OwnerId = @OwnerId; ";
+
+            connection.Execute(sql, new { Id = groupId, Name = group.Name, OwnerId = userId });
+
+            return true;
         }
         public bool RemoveGroupById(int groupId, Guid userId)
         {
-            if (!_service.IsGroupExists(groupId))
-            {
-                _logger.LogWarning("Group not found");
-                return false;
-            }
-            else
-            {
-                _sql.DeleteData("dbo.spGroup_DeleteById", new { Id = groupId, UserId = userId }, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	DELETE FROM dbo.[Group] WHERE Id = @Id AND OwnerId = @UserId; ";
+
+            connection.Execute(sql, new { Id = groupId, OwnerId = userId });
+
+            return true;
         }
         public bool SaveUserInGroup(UsersInGroupModel userInGroup)
         {
-            try
-            {
-                _sql.SaveData("dbo.spUsersInGroup_Insert", userInGroup, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
-            catch (Exception)
-            {
+            var connection = _sqlDataFactory.GetOpenConnection();
 
-                return false;
-            }
-            
+            var sql = "	INSERT INTO dbo.UsersInGroup(GroupId, UserId) VALUES(@GroupId, @UserId); ";
+
+            connection.Execute(sql, new { GroupId = userInGroup.GroupId, UserId = userInGroup.UserId });
+
+            return true;
         }
         public IEnumerable<UsersInGroupModel> GetAllUsersInGroup(int groupId)
         {
-            var output = _sql.LoadData<UsersInGroupModel, object>("dbo.spUsersInGroup_GetAll", new { GroupId = groupId }, "ConnectionStrings:TwoTaskData");
+            var connection = _sqlDataFactory.GetOpenConnection();
 
-            return output;
+            var sql = "	SELECT Id, GroupId, UserId FROM[dbo].[UsersInGroup] WHERE GroupId = @GroupId ORDER BY Id; ";
+
+            var groups = connection.Query<UsersInGroupModel>(sql, new { GroupId = groupId });
+
+            return groups;
         }
         public bool RemoveUserFromGroup(int groupId, Guid userId)
         {
-            if (_service.GetUserInGroupId(groupId, userId) == null)
-            {
-                _logger.LogWarning("User in group not found");
-                return false;
-            }
-            else
-            {
-                _sql.DeleteData("dbo.spUsersInGroup_DeleteUserById", new { Id = _service.GetUserInGroupId(groupId, userId) }, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	DELETE FROM dbo.UsersInGroup WHERE GroupId = @GroupId AND UserId = @UserId; ";
+
+            connection.Execute(sql, new { GroupId = groupId, UserId = userId });
+
+            return true;
         }
     }
 }

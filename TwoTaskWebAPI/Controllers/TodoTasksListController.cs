@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using TwoTaskLibrary.Application;
 using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
+using TwoTaskLibrary.Services;
 
 namespace TwoTaskWebAPI.Controllers
 {
@@ -12,15 +13,13 @@ namespace TwoTaskWebAPI.Controllers
     [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     public class TodoTasksListController : ControllerBase
     {
-        private readonly SqlDataAccess _sql;
-        protected ITodoTasksListRepository Data { get; set; }
-        private readonly ILogger<TodoTasksListRepository> _logger;
+        private readonly ITodoTasksListService _todoTasksListService;
+        private readonly ILogger<TodoTasksListController> _logger;
 
-        public TodoTasksListController(ILogger<TodoTasksListRepository> logger)
+        public TodoTasksListController(ILogger<TodoTasksListController> logger, ITodoTasksListService todoTasksListService)
         {
-            _sql = new SqlDataAccess();
+            _todoTasksListService = todoTasksListService;
             _logger = logger;
-            Data = new TodoTasksListRepository(_sql, _logger);
         }
 
         [NonAction]
@@ -31,8 +30,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] TodoTasksListModel list)
         {
-            list.UserId = GetCurrentUserId();
-            var result = Data.SaveTodoTasksList(list);
+            var result = _todoTasksListService.SaveTodoTasksList(list);
 
             return !result ? (IActionResult)NoContent() : Ok();
         }
@@ -40,20 +38,19 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(Data.GetAllTodoTasksLists(GetCurrentUserId()));
+            return Ok(_todoTasksListService.GetAllTodoTasksLists(GetCurrentUserId()));
         }
 
         [HttpGet("{listId}")]
         public IActionResult Get(int listId)
         {
-            return Ok(Data.GetTodoTasksListById(listId, GetCurrentUserId()));
+            return Ok(_todoTasksListService.GetTodoTasksListById(listId, GetCurrentUserId()));
         }
 
         [HttpPut("{listId}")]
         public IActionResult Put(int listId, [FromBody] TodoTasksListModel list)
         {
-            list.UserId = GetCurrentUserId();
-            var result = Data.UpdateTodoTasksListById(listId, list, GetCurrentUserId());
+            var result = _todoTasksListService.UpdateTodoTasksListById(listId, list, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }
@@ -61,7 +58,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{listId}")]
         public IActionResult Delete(int listId)
         {          
-            var result = Data.RemoveTodoTasksListById(listId, GetCurrentUserId());
+            var result = _todoTasksListService.RemoveTodoTasksListById(listId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

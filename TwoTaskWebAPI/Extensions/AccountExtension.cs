@@ -9,14 +9,12 @@ namespace TwoTaskWebAPI.Extensions
 {
     public class AccountExtension
     {
+        private readonly ISqlDataFactory _sqlDataFactory;
         private readonly JwtSettings _jwtSettings;
-        private readonly SqlDataAccess _sql;
-        private readonly ILogger<AccountRepository> _logger;
-        public AccountExtension(JwtSettings jwtSettings, SqlDataAccess sql, ILogger<AccountRepository> logger)
+        public AccountExtension(JwtSettings jwtSettings, ISqlDataFactory sqlDataFactory)
         {
             _jwtSettings = jwtSettings;
-            _sql = sql;
-            _logger = logger;
+            _sqlDataFactory = sqlDataFactory;
         }
         public UserToken? GenerateToken(UserModel user)
         {
@@ -46,7 +44,7 @@ namespace TwoTaskWebAPI.Extensions
 
         public UserModel? IsUserNameFound(UserLoginModel userLogin)
         {
-            var Data = new AccountRepository(_sql, _logger);
+            var Data = new AccountRepository(_sqlDataFactory);
             var users = Data.GetAllUsers();
             if (users != null)
             {

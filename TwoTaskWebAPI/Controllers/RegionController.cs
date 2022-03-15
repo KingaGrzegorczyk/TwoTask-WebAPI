@@ -4,6 +4,7 @@ using TwoTaskLibrary.Application;
 using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
+using TwoTaskLibrary.Services;
 
 namespace TwoTaskWebAPI.Controllers
 {
@@ -12,15 +13,13 @@ namespace TwoTaskWebAPI.Controllers
     [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     public class RegionController : ControllerBase
     {
-        private readonly SqlDataAccess _sql;
-        protected IRegionRepository Data { get; set; }
-        private readonly ILogger<RegionRepository> _logger;
+        private readonly IRegionService _regionService;
+        private readonly ILogger<RegionController> _logger;
 
-        public RegionController(ILogger<RegionRepository> logger)
+        public RegionController(ILogger<RegionController> logger, IRegionService regionService)
         {
-            _sql = new SqlDataAccess();
+            _regionService = regionService;
             _logger = logger;
-            Data = new RegionRepository(_sql, _logger);
         }
 
         [NonAction]
@@ -32,8 +31,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] RegionModel region)
         {
-            region.UserId = GetCurrentUserId();
-            var result = Data.SaveRegion(region);
+            var result = _regionService.SaveRegion(region);
 
             return !result ? (IActionResult)NoContent() : Ok();         
         }
@@ -41,20 +39,19 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(Data.GetAllRegions(GetCurrentUserId()));
+            return Ok(_regionService.GetAllRegions(GetCurrentUserId()));
         }
 
         [HttpGet("{regionId}")]
         public IActionResult Get(int regionId)
         {
-            return Ok(Data.GetRegionById(regionId, GetCurrentUserId()));
+            return Ok(_regionService.GetRegionById(regionId, GetCurrentUserId()));
         }
 
         [HttpPut("{regionId}")]
         public IActionResult Put(int regionId, [FromBody] RegionModel region)
         {
-            region.UserId = GetCurrentUserId();
-            var result = Data.UpdateRegionById(regionId, region, GetCurrentUserId());
+            var result = _regionService.UpdateRegionById(regionId, region, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }
@@ -62,7 +59,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{regionId}")]
         public IActionResult Delete(int regionId)
         {
-            var result = Data.RemoveRegionById(regionId, GetCurrentUserId());
+            var result = _regionService.RemoveRegionById(regionId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,64 +13,71 @@ namespace TwoTaskLibrary.Application
 {
     public class TodoTasksListRepository : ITodoTasksListRepository 
     {
-        private readonly SqlDataAccess _sql;
-        private readonly TodoTasksListService _service;
-        private readonly ILogger<TodoTasksListRepository> _logger;
-        public TodoTasksListRepository(SqlDataAccess sql, ILogger<TodoTasksListRepository> logger)
+        private readonly ISqlDataFactory _sqlDataFactory;
+
+        public TodoTasksListRepository(ISqlDataFactory sqlDataFactory)
         {
-            _sql = sql;
-            _service = new TodoTasksListService(_sql);
-            _logger = logger;
+            _sqlDataFactory = sqlDataFactory;
+        }
+        public bool IsTodoTasksListExists(int listId, Guid userId)
+        {
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	SELECT Id, [Name], CategoryId, IsArchived, Colour, Privacy, UserId FROM[dbo].[TodoTasksList] WHERE Id = @Id AND UserId = @UserId; ";
+
+            var list = connection.Query<TodoTasksListModel>(sql, new { Id = listId, UserId = userId }).Single();
+
+            return list != null;
         }
         public bool SaveTodoTasksList(TodoTasksListModel list)
         {
-            try
-            {
-                _sql.SaveData("dbo.spTodoTasksList_Insert", list, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }            
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	INSERT INTO dbo.TodoTasksList([Name], CategoryId, IsArchived, Colour, Privacy, UserId) VALUES(@Name, @CategoryId, @IsArchived, @Colour, @Privacy, @UserId); ";
+
+            connection.Execute(sql, new { Name = list.Name, CategoryId = list.CategoryId, IsArchived = list.IsArchived, Colour = list.Colour, Privacy = list.Privacy, UserId = list.UserId });
+
+            return true;
         }
         public IEnumerable<TodoTasksListModel> GetAllTodoTasksLists(Guid userId)
         {
-            var output = _sql.LoadData<TodoTasksListModel, object>("dbo.spTodoTasksList_GetAll", new { UserId = userId  }, "ConnectionStrings:TwoTaskData");
+            var connection = _sqlDataFactory.GetOpenConnection();
 
-            return output;
+            var sql = "	SELECT Id, [Name], CategoryId, IsArchived, Colour, Privacy, UserId FROM[dbo].[TodoTasksList] WHERE UserId = @UserId ORDER BY Id; ";
+
+            var lists = connection.Query<TodoTasksListModel>(sql, new { UserId = userId });
+
+            return lists;
         }
         public TodoTasksListModel GetTodoTasksListById(int listId, Guid userId)
         {
-            var output = _sql.LoadData<TodoTasksListModel, object>("dbo.spTodoTasksList_GetById", new { Id = listId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var connection = _sqlDataFactory.GetOpenConnection();
 
-            return output;
+            var sql = "	SELECT Id, [Name], CategoryId, IsArchived, Colour, Privacy, UserId FROM[dbo].[TodoTasksList] WHERE Id = @Id AND UserId = @UserId; ";
+
+            var list = connection.Query<TodoTasksListModel>(sql, new { Id = listId, UserId = userId }).Single();
+
+            return list;
         }
         public bool UpdateTodoTasksListById(int listId, TodoTasksListModel list, Guid userId)
         {
-            if (!_service.IsTodoTasksListExists(listId, userId))
-            {
-                _logger.LogWarning("List not found");
-                return false;
-            }
-            else
-            {
-                _sql.UpdateData("dbo.spTodoTasksList_UpdateById", list, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	UPDATE dbo.TodoTasksList SET[Name] = @Name, CategoryId = @CategoryId, IsArchived = @IsArchived, Colour = @Colour, Privacy = @Privacy, UserId = @UserId WHERE Id = @Id AND UserId = @UserId; ";
+
+            connection.Execute(sql, new { Id = listId, Name = list.Name, CategoryId = list.CategoryId, IsArchived = list.IsArchived, Colour = list.Colour, Privacy = list.Privacy, UserId = userId });
+
+            return true;
         }
         public bool RemoveTodoTasksListById(int listId, Guid userId)
         {
-            if (!_service.IsTodoTasksListExists(listId, userId))
-            {
-                _logger.LogWarning("List not found");
-                return false;
-            }
-            else
-            {
-                _sql.DeleteData("dbo.spTodoTasksList_DeleteById", new { Id = listId, UserId = userId }, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	DELETE FROM dbo.TodoTasksList WHERE Id = @Id AND UserId = @UserId; ";
+
+            connection.Execute(sql, new { Id = listId, UserId = userId });
+
+            return true;
         }
     }
 }

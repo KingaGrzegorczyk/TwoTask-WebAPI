@@ -3,31 +3,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TwoTaskLibrary.Application;
 using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 
 namespace TwoTaskLibrary.Services
 {
-    public class TodoTaskService
+    public interface ITodoTaskService
     {
-        private readonly SqlDataAccess _sql;
+        bool SaveTodoTask(TodoTaskModel todoTask);
+        IEnumerable<TodoTaskModel> GetAllTodoTasks(Guid userId);
+        TodoTaskModel GetTodoTaskById(int taskId, Guid userId);
+        bool UpdateTodoTaskById(int taskId, TodoTaskModel todoTask, Guid userId);
+        bool RemoveTodoTaskById(int taskId, Guid userId);
+    }
+    public class TodoTaskService : ITodoTaskService
+    {
+        private readonly ITodoTaskRepository _todoTaskRepository;
 
-        public TodoTaskService(SqlDataAccess sql)
+        public TodoTaskService(ITodoTaskRepository todoTaskRepository)
         {
-            _sql = sql;
+            _todoTaskRepository = todoTaskRepository;
         }
 
-        public bool IsTodoTaskExists(int taskId, Guid userId)
+        public bool SaveTodoTask(TodoTaskModel todoTask)
         {
-            var task = _sql.LoadData<TodoTaskModel, object>("dbo.spTodoTask_GetById", new { Id = taskId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
-            if (task != null)
-            {
-                return true;
-            }
+            return _todoTaskRepository.SaveTodoTask(todoTask);
+        }
+        public IEnumerable<TodoTaskModel> GetAllTodoTasks(Guid userId)
+        {
+            return _todoTaskRepository.GetAllTodoTasks(userId);
+        }
+        public TodoTaskModel GetTodoTaskById(int taskId, Guid userId)
+        {
+            return _todoTaskRepository.GetTodoTaskById(taskId, userId);
+        }
+        public bool UpdateTodoTaskById(int taskId, TodoTaskModel todoTask, Guid userId)
+        {
+            if (_todoTaskRepository.IsTodoTaskExists(taskId, userId))
+                return _todoTaskRepository.UpdateTodoTaskById(taskId, todoTask, userId);
             else
-            {
                 return false;
-            }
+        }
+        public bool RemoveTodoTaskById(int taskId, Guid userId)
+        {
+            if (_todoTaskRepository.IsTodoTaskExists(taskId, userId))
+                return _todoTaskRepository.RemoveTodoTaskById(taskId, userId);
+            else
+                return false;
         }
     }
 }

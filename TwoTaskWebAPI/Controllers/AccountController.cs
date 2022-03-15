@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using TwoTaskLibrary.Application;
 using TwoTaskWebAPI.Extensions;
+using TwoTaskLibrary.Services;
 
 namespace TwoTaskWebAPI.Controllers
 {
@@ -16,29 +17,28 @@ namespace TwoTaskWebAPI.Controllers
     public class AccountController : ControllerBase
     {
         private readonly JwtSettings _jwtSettings;
-        private readonly SqlDataAccess _sql;
-        protected IAccountRepository Data { get; set; }
-        private readonly ILogger<AccountRepository> _logger;
-        private AccountExtension _extension;
+        private readonly IAccountService _accountService;
+        private readonly ILogger<AccountController> _logger;
+        private readonly AccountExtension _extension;
+        private readonly ISqlDataFactory _sqlDataFactory;
 
-        public AccountController(JwtSettings jwtSettings, ILogger<AccountRepository> logger)
+        public AccountController(JwtSettings jwtSettings, ILogger<AccountController> logger, ISqlDataFactory sqlDataFactory, IAccountService accountService)
         {
             _jwtSettings = jwtSettings;
-            _sql = new SqlDataAccess();
             _logger = logger;
-            Data = new AccountRepository(_sql, _logger);
-            _extension = new AccountExtension(_jwtSettings, _sql, _logger);
+            _sqlDataFactory = sqlDataFactory;
+            _accountService = accountService;
+            _extension = new AccountExtension(_jwtSettings, _sqlDataFactory);
         }
 
         [HttpPost]
         public IActionResult Register(UserRegisterModel register)
         {
-            if(Data.IsUserNameIsTaken(register.Username)) 
+            if(_accountService.RegisterUser(register) == null) 
                 return BadRequest("UserName Is Already Taken");
             else
-            {                
-                var result = Data.Register(register);
-                return !result ? (IActionResult)NoContent() : Ok();
+            {
+                return Ok();
             }           
         }
 
@@ -64,7 +64,7 @@ namespace TwoTaskWebAPI.Controllers
         [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult GetAllUsers()
         {
-            return Ok(Data.GetAllUsers());
+            return Ok(_accountService.GetAllUsers());
         }
     }
 }

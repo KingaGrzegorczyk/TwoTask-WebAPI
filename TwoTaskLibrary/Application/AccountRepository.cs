@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,44 +13,38 @@ namespace TwoTaskLibrary.Application
 {
     public class AccountRepository : IAccountRepository
     {
-        private readonly SqlDataAccess _sql;
-        private readonly AccountService _service;
-        private readonly ILogger<AccountRepository> _logger;
-        public AccountRepository(SqlDataAccess sql, ILogger<AccountRepository> logger)
+        private readonly ISqlDataFactory _sqlDataFactory;
+        public AccountRepository(ISqlDataFactory sqlDataFactory)
         {
-            _sql = sql;
-            _service = new AccountService(_sql);
-            _logger = logger;
+            _sqlDataFactory = sqlDataFactory;
         }
         public bool Register(UserRegisterModel register)
         {
-            try
-            {
-                _sql.SaveData("dbo.spUser_Insert", _service.RegisterUser(register), "ConnectionStrings:TwoTaskData");
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }           
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	INSERT INTO dbo.[User](Id, UserName, Email, [Password], PasswordSalt) VALUES(@Id, @UserName, @Email, @Password, @PasswordSalt); ";
+
+            connection.Execute(sql, new { Id = Guid.NewGuid(), UserName = register.Username.ToLower(), email = register.Email });
+            return true;
         }        
         public bool IsUserNameIsTaken(string username)
         {
-            var user = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetByName", new { UserName = username }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
-            if(user != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	SELECT Id, UserName, Email, [Password], PasswordSalt FROM[dbo].[User] WHERE UserName = @UserName; ";
+
+            var user = connection.Query(sql, new { UserName = username.ToLower() });
+
+            return user != null;
         }
         public IEnumerable<UserModel> GetAllUsers()
         {
-            var output = _sql.LoadData<UserModel, dynamic>("dbo.spUser_GetAll", new { }, "ConnectionStrings:TwoTaskData");
+            var connection = _sqlDataFactory.GetOpenConnection();
+            var sql = " SELECT Id, UserName, Email, [Password], PasswordSalt FROM[dbo].[User] ORDER BY Id; ";
 
-            return output;
+            IEnumerable<UserModel> users = connection.Query<UserModel>(sql);
+
+            return users;
         }
       
     }

@@ -4,7 +4,7 @@ using TwoTaskLibrary.Application;
 using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
-
+using TwoTaskLibrary.Services;
 
 namespace TwoTaskWebAPI.Controllers
 {
@@ -13,15 +13,13 @@ namespace TwoTaskWebAPI.Controllers
     [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     public class LocationController : ControllerBase
     {
-        private readonly SqlDataAccess _sql;
-        protected ILocationRepository Data { get; set; }
-        private readonly ILogger<LocationRepository> _logger;
+        private readonly ILocationService _locationService;
+        private readonly ILogger<LocationController> _logger;
 
-        public LocationController(ILogger<LocationRepository> logger)
+        public LocationController(ILogger<LocationController> logger, ILocationService locationService)
         {
-            _sql = new SqlDataAccess();
             _logger = logger;
-            Data = new LocationRepository(_sql, _logger);
+            _locationService = locationService;
         }
 
         [NonAction]
@@ -33,8 +31,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] LocationModel location)
         {
-            location.UserId = GetCurrentUserId();
-            var result = Data.SaveLocation(location);
+            var result = _locationService.SaveLocation(location);
 
             return !result ? (IActionResult)NoContent() : Ok();
         }
@@ -42,20 +39,19 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(Data.GetAllLocations(GetCurrentUserId()));
+            return Ok(_locationService.GetAllLocations(GetCurrentUserId()));
         }
 
         [HttpGet("{locationId}")]
         public IActionResult Get(int locationId)
         {
-            return Ok(Data.GetLocationById(locationId, GetCurrentUserId()));
+            return Ok(_locationService.GetLocationById(locationId, GetCurrentUserId()));
         }
 
         [HttpPut("{locationId}")]
         public IActionResult Put(int locationId, [FromBody] LocationModel location)
         {
-            location.UserId = GetCurrentUserId();
-            var result = Data.UpdateLocationById(locationId, location, GetCurrentUserId());
+            var result = _locationService.UpdateLocationById(locationId, location, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }
@@ -63,7 +59,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{locationId}")]
         public IActionResult Delete(int locationId)
         {
-            var result = Data.RemoveLocationById(locationId, GetCurrentUserId());
+            var result = _locationService.RemoveLocationById(locationId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

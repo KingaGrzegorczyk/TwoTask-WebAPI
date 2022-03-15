@@ -4,7 +4,7 @@ using TwoTaskLibrary.Application;
 using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
-
+using TwoTaskLibrary.Services;
 
 namespace TwoTaskWebAPI.Controllers
 {
@@ -13,15 +13,13 @@ namespace TwoTaskWebAPI.Controllers
     [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
     public class ListsCategoryController : ControllerBase
     {
-        private readonly SqlDataAccess _sql;
-        protected IListsCategoryRepository Data { get; set; }
-        private readonly ILogger<ListsCategoryRepository> _logger;
+        private readonly IListsCategoryService _listsCategoryService;
+        private readonly ILogger<ListsCategoryController> _logger;
 
-        public ListsCategoryController(ILogger<ListsCategoryRepository> logger)
+        public ListsCategoryController(ILogger<ListsCategoryController> logger, IListsCategoryService listsCategoryService)
         {
-            _sql = new SqlDataAccess();
+            _listsCategoryService = listsCategoryService;
             _logger = logger;
-            Data = new ListsCategoryRepository(_sql, _logger);
         }
 
         [NonAction]
@@ -33,8 +31,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] ListsCategoryModel category)
         {
-            category.UserId = GetCurrentUserId();
-            var result = Data.SaveListsCategory(category);
+            var result = _listsCategoryService.SaveListsCategory(category);
 
             return !result ? (IActionResult)NoContent() : Ok();           
         }
@@ -42,20 +39,19 @@ namespace TwoTaskWebAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(Data.GetAllListsCategories(GetCurrentUserId()));
+            return Ok(_listsCategoryService.GetAllListsCategories(GetCurrentUserId()));
         }
 
         [HttpGet("{categoryId}")]
         public IActionResult Get(int categoryId)
         {
-            return Ok(Data.GetListsCategoryById(categoryId, GetCurrentUserId()));
+            return Ok(_listsCategoryService.GetListsCategoryById(categoryId, GetCurrentUserId()));
         }
 
         [HttpPut("{categoryId}")]
         public IActionResult Put(int categoryId, [FromBody] ListsCategoryModel category)
         {
-            category.UserId = GetCurrentUserId();
-            var result = Data.UpdateListsCategoryById(categoryId, category, GetCurrentUserId());
+            var result = _listsCategoryService.UpdateListsCategoryById(categoryId, category, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();           
         }
@@ -63,7 +59,7 @@ namespace TwoTaskWebAPI.Controllers
         [HttpDelete("{categoryId}")]
         public IActionResult Delete(int categoryId)
         {
-            var result = Data.RemoveListsCategoryById(categoryId, GetCurrentUserId());
+            var result = _listsCategoryService.RemoveListsCategoryById(categoryId, GetCurrentUserId());
 
             return !result ? (IActionResult)NoContent() : Ok();
         }

@@ -9,6 +9,7 @@ namespace TwoTaskLibrary.Application
 {
     public interface IRegionRepository
     {
+        bool IsRegionExists(int regionId, Guid userId);
         bool SaveRegion(RegionModel region);
         IEnumerable<RegionModel> GetAllRegions(Guid userId);
         RegionModel GetRegionById(int regionId, Guid userId);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -14,65 +15,71 @@ namespace TwoTaskLibrary.Application
 {
     public class TodoTaskRepository : ITodoTaskRepository
     {
-        private readonly SqlDataAccess _sql;
-        private readonly TodoTaskService _service;
-        private readonly ILogger<TodoTaskRepository> _logger;
+        private readonly ISqlDataFactory _sqlDataFactory;
 
-        public TodoTaskRepository(SqlDataAccess sql, ILogger<TodoTaskRepository> logger)
+        public TodoTaskRepository(ISqlDataFactory sqlDataFactory)
         {
-            _sql = sql;
-            _service = new TodoTaskService(_sql);
-            _logger = logger;
+            _sqlDataFactory = sqlDataFactory;
+        }
+        public bool IsTodoTaskExists(int taskId, Guid userId)
+        {
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	SELECT Id, ListId, BeginDate, EndDate, RegionId, [Description], Title, [Priority], [Status], UserId FROM[dbo].[TodoTask] WHERE Id = @Id AND UserId = @UserId; ";
+
+            var task = connection.Query<TodoTaskModel>(sql, new { Id = taskId, UserId = userId }).Single();
+
+            return task != null;
         }
         public bool SaveTodoTask(TodoTaskModel todoTask)
         {
-            try
-            {
-                _sql.SaveData("dbo.spTodoTask_Insert", todoTask, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }           
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	INSERT INTO dbo.TodoTask(ListId, BeginDate, EndDate, RegionId, [Description], Title, [Priority], [Status], UserId) VALUES(@ListId, @BeginDate, @EndDate, @RegionId, @Description, @Title, @Priority, @Status, @UserId); ";
+
+            connection.Execute(sql, new { ListId = todoTask.ListId, BeginDate = todoTask.BeginDate, EndDate = todoTask.EndDate, RegionId = todoTask.RegionId, Description = todoTask.Description, Title = todoTask.Title, Priority = todoTask.Priority, Status = todoTask.Status, UserId = todoTask.UserId });
+
+            return true;
         }
         public IEnumerable<TodoTaskModel> GetAllTodoTasks(Guid userId)
         {
-            var output = _sql.LoadData<TodoTaskModel, object>("dbo.spTodoTask_GetAll", new { UserId = userId }, "ConnectionStrings:TwoTaskData");
+            var connection = _sqlDataFactory.GetOpenConnection();
 
-            return output;
+            var sql = "	SELECT Id, ListId, BeginDate, EndDate, RegionId, [Description], Title, [Priority], [Status], UserId FROM[dbo].[TodoTask] WHERE UserId = @UserId ORDER BY Id; ";
+
+            var tasks = connection.Query<TodoTaskModel>(sql, new { UserId = userId });
+
+            return tasks;
         }
         public TodoTaskModel GetTodoTaskById(int taskId, Guid userId)
         {
-            var output = _sql.LoadData<TodoTaskModel, object>("dbo.spTodoTask_GetById", new { Id = taskId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var connection = _sqlDataFactory.GetOpenConnection();
 
-            return output;
+            var sql = "	SELECT Id, ListId, BeginDate, EndDate, RegionId, [Description], Title, [Priority], [Status], UserId FROM[dbo].[TodoTask] WHERE Id = @Id AND UserId = @UserId; ";
+
+            var task = connection.Query<TodoTaskModel>(sql, new { Id = taskId, UserId = userId }).Single();
+
+            return task;
         }
         public bool UpdateTodoTaskById(int taskId, TodoTaskModel todoTask, Guid userId)
         {
-            if (!_service.IsTodoTaskExists(taskId, userId))
-            {
-                _logger.LogWarning("TodoTask not found");
-                return false;
-            }
-            else
-            {
-                _sql.UpdateData("dbo.spTodoTask_UpdateById", todoTask, "ConnectionStrings:TwoTaskData");
-                return true;
-            }      
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	UPDATE dbo.TodoTask SET ListId = @ListId, BeginDate = @BeginDate, EndDate = @EndDate, RegionId = @RegionId, [Description] = @Description, Title = @Title, [Priority] = @Priority, [Status] = @Status, UserId = @UserId WHERE Id = @Id AND UserId = @UserId; ";
+
+            connection.Execute(sql, new { Id = taskId, ListId = todoTask.ListId, BeginDate = todoTask.BeginDate, EndDate = todoTask.EndDate, RegionId = todoTask.RegionId, Description = todoTask.Description, Title = todoTask.Title, Priority = todoTask.Priority, Status = todoTask.Status, UserId = userId });
+
+            return true;
         }
         public bool RemoveTodoTaskById(int taskId, Guid userId)
         {
-            if (!_service.IsTodoTaskExists(taskId, userId))
-            {
-                _logger.LogWarning("TodoTask not found");
-                return false;
-            }
-            else
-            {
-                _sql.DeleteData("dbo.spTodoTask_DeleteById", new { Id = taskId, UserId = userId }, "ConnectionStrings:TwoTaskData");
-                return true;
-            }           
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	DELETE FROM dbo.TodoTask WHERE Id = @Id AND UserId = @UserId; ";
+
+            connection.Execute(sql, new { Id = taskId, UserId = userId });
+
+            return true;
         }
     }
 }

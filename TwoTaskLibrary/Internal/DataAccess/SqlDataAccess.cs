@@ -12,8 +12,7 @@ using ConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBui
 
 namespace TwoTaskLibrary.Internal.DataAccess
 {
-    public class SqlDataAccess : ISqlDataAccess
-    {
+    public class SqlDataAccess     {
         public IConfiguration Configuration { get; }
         public SqlDataAccess()
         {

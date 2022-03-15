@@ -9,6 +9,7 @@ namespace TwoTaskLibrary.Application
 {
     public interface ITodoTaskRepository
     {
+        bool IsTodoTaskExists(int taskId, Guid userId);
         bool SaveTodoTask(TodoTaskModel todoTask);
         IEnumerable<TodoTaskModel> GetAllTodoTasks(Guid userId);
         TodoTaskModel GetTodoTaskById(int taskId, Guid userId);

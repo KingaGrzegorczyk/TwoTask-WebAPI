@@ -4,21 +4,31 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using TwoTaskLibrary.Application;
 using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 
 namespace TwoTaskLibrary.Services
 {
-    public class AccountService
+    public interface IAccountService
     {
-        private readonly SqlDataAccess _sql;
+        UserModel RegisterUser(UserRegisterModel register);
+        IEnumerable<UserModel> GetAllUsers();
+    }
 
-        public AccountService(SqlDataAccess sql)
+    public class AccountService : IAccountService
+    {
+        private readonly IAccountRepository _accountRepository;
+
+        public AccountService(IAccountRepository accountRepository)
         {
-            _sql = sql;
+            _accountRepository = accountRepository;
         }
         public UserModel RegisterUser(UserRegisterModel register)
         {
+            if (_accountRepository.IsUserNameIsTaken(register.Username))
+                return null;
+
             var hmac = new HMACSHA512();
 
             var user = new UserModel
@@ -30,7 +40,17 @@ namespace TwoTaskLibrary.Services
                 PasswordSalt = hmac.Key
             };
 
+            _accountRepository.Register(register); 
+
+
             return user;
-        }      
+        }
+
+        public IEnumerable<UserModel> GetAllUsers()
+        {
+            IEnumerable<UserModel> users = _accountRepository.GetAllUsers();
+
+            return users;
+        }
     }
 }

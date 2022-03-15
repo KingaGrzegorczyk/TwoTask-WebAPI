@@ -9,6 +9,7 @@ namespace TwoTaskLibrary.Application
 {
     public interface ILocationRepository
     {
+        bool IsLocationExists(int locationId, Guid userId);
         bool SaveLocation(LocationModel location);
         IEnumerable<LocationModel> GetAllLocations(Guid userId);
         LocationModel GetLocationById(int locationId, Guid userId);

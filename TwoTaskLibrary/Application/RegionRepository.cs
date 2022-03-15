@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Dapper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,65 +13,71 @@ namespace TwoTaskLibrary.Application
 {
     public class RegionRepository : IRegionRepository
     {
-        private readonly SqlDataAccess _sql;
-        private readonly RegionService _service;
-        private readonly ILogger<RegionRepository> _logger;
+        private readonly ISqlDataFactory _sqlDataFactory;
 
-        public RegionRepository(SqlDataAccess sql, ILogger<RegionRepository> logger)
+        public RegionRepository(ISqlDataFactory sqlDataFactory)
         {
-            _sql = sql;
-            _service = new RegionService(_sql);
-            _logger = logger;
+            _sqlDataFactory = sqlDataFactory;
+        }
+        public bool IsRegionExists(int regionId, Guid userId)
+        {
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	SELECT Id, [Name], UserId FROM [dbo].[Region] WHERE Id = @Id AND UserId = @UserId; ";
+
+            var region = connection.Query<RegionModel>(sql, new { Id = regionId, UserId = userId }).Single();
+
+            return region != null;
         }
         public bool SaveRegion(RegionModel region)
         {
-            try
-            {
-                _sql.SaveData("dbo.spRegion_Insert", region, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }           
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	INSERT INTO [dbo].[Region]([Name], UserId) VALUES(@Name, @UserId); ";
+
+            connection.Execute(sql, new { Name = region.Name, UserId = region.UserId });
+
+            return true;
         }
         public IEnumerable<RegionModel> GetAllRegions(Guid userId)
         {
-            var output = _sql.LoadData<RegionModel, object>("dbo.spRegion_GetAll", new { UserId = userId }, "ConnectionStrings:TwoTaskData");
+            var connection = _sqlDataFactory.GetOpenConnection();
 
-            return output;
+            var sql = "	SELECT Id, [Name], UserId FROM [dbo].[Region] WHERE UserId = @UserId ORDER BY Id; ";
+
+            var regions = connection.Query<RegionModel>(sql, new { UserId = userId });
+
+            return regions;
         }
         public RegionModel GetRegionById(int regionId, Guid userId)
         {
-            var output = _sql.LoadData<RegionModel, object>("dbo.spRegion_GetById", new { Id = regionId, UserId = userId }, "ConnectionStrings:TwoTaskData").FirstOrDefault();
+            var connection = _sqlDataFactory.GetOpenConnection();
 
-            return output;
+            var sql = "	SELECT Id, [Name], UserId FROM [dbo].[Region] WHERE Id = @Id AND UserId = @UserId; ";
+
+            var region = connection.Query<RegionModel>(sql, new { Id = regionId, UserId = userId }).Single();
+
+            return region;
         }
         public bool UpdateRegionById(int regionId, RegionModel region, Guid userId)
         {
-            if (!_service.IsRegionExists(regionId, userId))
-            {
-                _logger.LogWarning("Region not found");
-                return false;
-            }
-            else
-            {
-                _sql.UpdateData("dbo.spRegion_UpdateById", region, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	UPDATE [dbo].[Region] SET[Name] = @Name, UserId = @UserId WHERE Id = @Id AND UserId = @UserId; ";
+
+            connection.Execute(sql, new { Id = regionId, Name = region.Name, UserId = userId });
+
+            return true;
         }
         public bool RemoveRegionById(int regionId, Guid userId)
         {
-            if (!_service.IsRegionExists(regionId, userId))
-            {
-                _logger.LogWarning("Region not found");
-                return false;
-            }
-            else
-            {
-                _sql.DeleteData("dbo.spRegion_DeleteById", new { Id = regionId, UserId = userId }, "ConnectionStrings:TwoTaskData");
-                return true;
-            }
+            var connection = _sqlDataFactory.GetOpenConnection();
+
+            var sql = "	DELETE FROM [dbo].[Region] WHERE Id = @Id AND UserId = @UserId; ";
+
+            connection.Execute(sql, new { Id = regionId, UserId = userId });
+
+            return true;
         }
     }
 }
