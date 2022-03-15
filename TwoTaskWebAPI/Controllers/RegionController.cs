@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TwoTaskLibrary.Application;
-using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
 using TwoTaskLibrary.Services;
+using TwoTaskWebAPI.Extensions;
 
 namespace TwoTaskWebAPI.Controllers
 {
@@ -23,9 +23,9 @@ namespace TwoTaskWebAPI.Controllers
         }
 
         [NonAction]
-        public virtual Guid GetCurrentUserId()
+        public Guid GetCurrentUserId()
         {
-            return Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value);
+            return HttpContext.GetUserId();
         }
 
         [HttpPost]

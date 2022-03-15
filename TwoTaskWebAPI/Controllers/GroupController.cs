@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TwoTaskLibrary.Application;
-using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
 using TwoTaskLibrary.Services;
+using TwoTaskWebAPI.Extensions;
 
 namespace TwoTaskWebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)]
-    public partial class GroupController : ControllerBase
+    public class GroupController : ControllerBase
     {
         private readonly IGroupService _groupService;
         private readonly ILogger<GroupController> _logger;
@@ -20,6 +20,12 @@ namespace TwoTaskWebAPI.Controllers
         {
             _logger = logger;
             _groupService = groupService;
+        }
+
+        [NonAction]
+        public Guid GetCurrentUserId()
+        {
+            return HttpContext.GetUserId();
         }
 
         [HttpPost]

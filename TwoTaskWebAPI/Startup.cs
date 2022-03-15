@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TwoTaskLibrary.Application;
-using TwoTaskLibrary.Internal.DataAccess;
 
 namespace TwoTaskWebAPI
 {

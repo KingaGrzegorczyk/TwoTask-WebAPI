@@ -162,9 +162,7 @@
     <Compile Include="Application\RegionRepository.cs" />
     <Compile Include="Application\TodoTaskRepository.cs" />
     <Compile Include="Application\TodoTasksListRepository.cs" />
-    <Compile Include="Internal\DataAccess\ISqlDataAccess.cs" />
     <Compile Include="Internal\DataAccess\ISqlDataFactory.cs" />
-    <Compile Include="Internal\DataAccess\SqlDataAccess.cs" />
     <Compile Include="Models\GroupModel.cs" />
     <Compile Include="Models\ListsCategoryModel.cs" />
     <Compile Include="Models\LocationModel.cs" />

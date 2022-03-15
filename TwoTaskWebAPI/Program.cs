@@ -1,6 +1,5 @@
 using TwoTaskWebAPI.Extensions;
 using TwoTaskLibrary.Application;
-using TwoTaskLibrary.Internal.DataAccess;
 using TwoTaskLibrary.Services;
 
 var builder = Microsoft.AspNetCore.Builder.WebApplication.CreateBuilder(args);
@@ -46,6 +45,12 @@ builder.Services.AddScoped<ITodoTaskRepository, TodoTaskRepository>();
 builder.Services.AddScoped<ITodoTasksListRepository, TodoTasksListRepository>();
 builder.Services.AddScoped<ISqlDataFactory>(x => new SqlDataFactory(dbConnectionString));
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddScoped<IListsCategoryService, ListsCategoryService>();
+builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<IRegionService, RegionService>();
+builder.Services.AddScoped<ITodoTaskService, TodoTaskService>();
+builder.Services.AddScoped<ITodoTasksListService, TodoTasksListService>();
 
 
 var app = builder.Build();

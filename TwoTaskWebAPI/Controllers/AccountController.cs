@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TwoTaskLibrary.Models;
 using TwoTaskWebAPI.JwtHelpers;
-using TwoTaskLibrary.Internal.DataAccess;
 using System.Security.Cryptography;
 using System.Text;
 using TwoTaskLibrary.Application;
