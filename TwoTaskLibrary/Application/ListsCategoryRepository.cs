@@ -21,9 +21,9 @@ namespace TwoTaskLibrary.Application
     }
     public class ListsCategoryRepository : IListsCategoryRepository
     {
-        private readonly SqlDataFactory _sqlDataFactory;
+        private readonly ISqlDataFactory _sqlDataFactory;
 
-        public ListsCategoryRepository(SqlDataFactory sqlDataFactory)
+        public ListsCategoryRepository(ISqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

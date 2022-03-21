@@ -21,9 +21,9 @@ namespace TwoTaskLibrary.Application
     }
     public class LocationRepository : ILocationRepository
     {
-        private readonly SqlDataFactory _sqlDataFactory;
+        private readonly ISqlDataFactory _sqlDataFactory;
 
-        public LocationRepository(SqlDataFactory sqlDataFactory)
+        public LocationRepository(ISqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

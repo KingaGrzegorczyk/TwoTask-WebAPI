@@ -46,7 +46,7 @@ builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<ITodoTaskRepository, TodoTaskRepository>();
 builder.Services.AddScoped<ITodoTasksListRepository, TodoTasksListRepository>();
-builder.Services.AddScoped<SqlDataFactory>(x => new SqlDataFactory(dbConnectionString));
+builder.Services.AddScoped<ISqlDataFactory>(x => new SqlDataFactory(dbConnectionString));
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IGroupService, GroupService>();
 builder.Services.AddScoped<IListsCategoryService, ListsCategoryService>();
@@ -75,3 +75,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+public partial class Program { }

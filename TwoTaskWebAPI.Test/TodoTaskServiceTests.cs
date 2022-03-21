@@ -9,19 +9,20 @@ using TwoTaskLibrary.Models;
 using TwoTaskLibrary.Services;
 using Xunit;
 
-namespace TwoTaskWebAPI.Test
+namespace TwoTaskWebAPI.UnitTests
 {
     public class TodoTaskServiceTests
     {
         private Mock<ITodoTaskRepository> _todoTaskRepository;
         private TodoTaskService _todoTaskService;
-
+        private readonly Guid _userId;
         public TodoTaskServiceTests()
         {
+            this._userId = Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5");
             this._todoTaskRepository = new Mock<ITodoTaskRepository>();
-            this._todoTaskRepository.Setup(x => x.UpdateTodoTaskById(It.IsAny<int>(), It.IsAny<TodoTaskModel>(), It.IsAny<Guid>())).Returns(true);
-            this._todoTaskRepository.Setup(x => x.RemoveTodoTaskById(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
-            this._todoTaskRepository.Setup(x => x.IsTodoTaskExists(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
+            this._todoTaskRepository.Setup(x => x.UpdateTodoTaskById(It.IsAny<int>(), It.IsAny<TodoTaskModel>(), _userId)).Returns(true);
+            this._todoTaskRepository.Setup(x => x.RemoveTodoTaskById(It.IsAny<int>(), _userId)).Returns(true);
+            this._todoTaskRepository.Setup(x => x.IsTodoTaskExists(It.IsAny<int>(), _userId)).Returns(true);
 
 
             _todoTaskService = new TodoTaskService(this._todoTaskRepository.Object);
@@ -30,7 +31,7 @@ namespace TwoTaskWebAPI.Test
         [Fact]
         public void UpdateTodoTask_False()
         {
-            this._todoTaskRepository.Setup(x => x.IsTodoTaskExists(It.IsAny<int>(), It.IsAny<Guid>())).Returns(false);
+            this._todoTaskRepository.Setup(x => x.IsTodoTaskExists(It.IsAny<int>(), _userId)).Returns(false);
 
             TodoTaskModel model = new TodoTaskModel
             {
@@ -43,11 +44,11 @@ namespace TwoTaskWebAPI.Test
                 Title = "clean house",
                 Priority = 1,
                 Status = "in progress",
-                UserId = Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff4")
+                UserId = _userId
 
             };
 
-            var result = _todoTaskService.UpdateTodoTaskById(model.Id, model, Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5"));
+            var result = _todoTaskService.UpdateTodoTaskById(model.Id, model, _userId);
 
             Assert.False(result);
         }
@@ -55,7 +56,7 @@ namespace TwoTaskWebAPI.Test
         [Fact]
         public void UpdateTodoTask_True()
         {
-            this._todoTaskRepository.Setup(x => x.IsTodoTaskExists(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
+            this._todoTaskRepository.Setup(x => x.IsTodoTaskExists(It.IsAny<int>(), _userId)).Returns(true);
 
             TodoTaskModel model = new TodoTaskModel
             {
@@ -68,11 +69,11 @@ namespace TwoTaskWebAPI.Test
                 Title = "clean house",
                 Priority = 1,
                 Status = "in progress",
-                UserId = Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff4")
+                UserId = _userId
 
             };
 
-            var result = _todoTaskService.UpdateTodoTaskById(model.Id, model, Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5"));
+            var result = _todoTaskService.UpdateTodoTaskById(model.Id, model, _userId);
 
             Assert.True(result);
         }
@@ -80,7 +81,7 @@ namespace TwoTaskWebAPI.Test
         [Fact]
         public void RemoveTodoTask_False()
         {
-            this._todoTaskRepository.Setup(x => x.IsTodoTaskExists(It.IsAny<int>(), It.IsAny<Guid>())).Returns(false);
+            this._todoTaskRepository.Setup(x => x.IsTodoTaskExists(It.IsAny<int>(), _userId)).Returns(false);
 
             TodoTaskModel model = new TodoTaskModel
             {
@@ -93,11 +94,11 @@ namespace TwoTaskWebAPI.Test
                 Title = "clean house",
                 Priority = 1,
                 Status = "in progress",
-                UserId = Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff4")
+                UserId = _userId
 
             };
 
-            var result = _todoTaskService.RemoveTodoTaskById(model.Id, Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5"));
+            var result = _todoTaskService.RemoveTodoTaskById(model.Id, _userId);
 
             Assert.False(result);
         }
@@ -105,7 +106,7 @@ namespace TwoTaskWebAPI.Test
         [Fact]
         public void RemoveTodoTask_True()
         {
-            this._todoTaskRepository.Setup(x => x.IsTodoTaskExists(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
+            this._todoTaskRepository.Setup(x => x.IsTodoTaskExists(It.IsAny<int>(), _userId)).Returns(true);
 
             TodoTaskModel model = new TodoTaskModel
             {
@@ -118,11 +119,11 @@ namespace TwoTaskWebAPI.Test
                 Title = "clean house",
                 Priority = 1,
                 Status = "in progress",
-                UserId = Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff4")
+                UserId = _userId
 
             };
 
-            var result = _todoTaskService.RemoveTodoTaskById(model.Id, Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5"));
+            var result = _todoTaskService.RemoveTodoTaskById(model.Id, _userId);
 
             Assert.True(result);
         }

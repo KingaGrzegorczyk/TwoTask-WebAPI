@@ -5,7 +5,7 @@ using TwoTaskLibrary.Models;
 using TwoTaskLibrary.Services;
 using Xunit;
 
-namespace TwoTaskWebAPI.Test
+namespace TwoTaskWebAPI.UnitTests
 {
     public class AccountServiceTests
     {

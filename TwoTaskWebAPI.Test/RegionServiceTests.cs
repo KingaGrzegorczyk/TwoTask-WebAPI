@@ -9,19 +9,21 @@ using TwoTaskLibrary.Models;
 using TwoTaskLibrary.Services;
 using Xunit;
 
-namespace TwoTaskWebAPI.Test
+namespace TwoTaskWebAPI.UnitTests
 {
     public class RegionServiceTests
     {
         private Mock<IRegionRepository> _regionRepository;
         private RegionService _regionService;
+        private readonly Guid _userId;
 
         public RegionServiceTests()
         {
+            this._userId = Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5");
             this._regionRepository = new Mock<IRegionRepository>();
-            this._regionRepository.Setup(x => x.UpdateRegionById(It.IsAny<int>(), It.IsAny<RegionModel>(), It.IsAny<Guid>())).Returns(true);
-            this._regionRepository.Setup(x => x.RemoveRegionById(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
-            this._regionRepository.Setup(x => x.IsRegionExists(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
+            this._regionRepository.Setup(x => x.UpdateRegionById(It.IsAny<int>(), It.IsAny<RegionModel>(), _userId)).Returns(true);
+            this._regionRepository.Setup(x => x.RemoveRegionById(It.IsAny<int>(), _userId)).Returns(true);
+            this._regionRepository.Setup(x => x.IsRegionExists(It.IsAny<int>(), _userId)).Returns(true);
 
 
             _regionService = new RegionService(this._regionRepository.Object);
@@ -30,16 +32,16 @@ namespace TwoTaskWebAPI.Test
         [Fact]
         public void UpdateRegion_False()
         {
-            this._regionRepository.Setup(x => x.IsRegionExists(It.IsAny<int>(), It.IsAny<Guid>())).Returns(false);
+            this._regionRepository.Setup(x => x.IsRegionExists(It.IsAny<int>(), _userId)).Returns(false);
 
             RegionModel model = new RegionModel()
             {
                 Id = 1,
                 Name = "School",
-                UserId = Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5")
+                UserId = _userId
             };
 
-            var result = _regionService.UpdateRegionById(model.Id, model, Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5"));
+            var result = _regionService.UpdateRegionById(model.Id, model, _userId);
 
             Assert.False(result);
         }
@@ -47,16 +49,16 @@ namespace TwoTaskWebAPI.Test
         [Fact]
         public void UpdateRegion_True()
         {
-            this._regionRepository.Setup(x => x.IsRegionExists(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
+            this._regionRepository.Setup(x => x.IsRegionExists(It.IsAny<int>(), _userId)).Returns(true);
 
             RegionModel model = new RegionModel()
             {
                 Id = 1,
                 Name = "School",
-                UserId = Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5")
+                UserId = _userId
             };
 
-            var result = _regionService.UpdateRegionById(model.Id, model, Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5"));
+            var result = _regionService.UpdateRegionById(model.Id, model, _userId);
 
             Assert.True(result);
         }
@@ -64,16 +66,16 @@ namespace TwoTaskWebAPI.Test
         [Fact]
         public void RemoveRegion_False()
         {
-            this._regionRepository.Setup(x => x.IsRegionExists(It.IsAny<int>(), It.IsAny<Guid>())).Returns(false);
+            this._regionRepository.Setup(x => x.IsRegionExists(It.IsAny<int>(), _userId)).Returns(false);
 
             RegionModel model = new RegionModel()
             {
                 Id = 1,
                 Name = "School",
-                UserId = Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5")
+                UserId = _userId
             };
 
-            var result = _regionService.RemoveRegionById(model.Id, Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5"));
+            var result = _regionService.RemoveRegionById(model.Id, _userId);
 
             Assert.False(result);
         }
@@ -81,16 +83,16 @@ namespace TwoTaskWebAPI.Test
         [Fact]
         public void RemoveRegion_True()
         {
-            this._regionRepository.Setup(x => x.IsRegionExists(It.IsAny<int>(), It.IsAny<Guid>())).Returns(true);
+            this._regionRepository.Setup(x => x.IsRegionExists(It.IsAny<int>(), _userId)).Returns(true);
 
             RegionModel model = new RegionModel()
             {
                 Id = 1,
                 Name = "School",
-                UserId = Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5")
+                UserId = _userId
             };
 
-            var result = _regionService.RemoveRegionById(model.Id, Guid.Parse("5418b246-9d9f-4d37-a6d9-a283a2169ff5"));
+            var result = _regionService.RemoveRegionById(model.Id, _userId);
 
             Assert.True(result);
         }

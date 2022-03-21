@@ -18,8 +18,8 @@ namespace TwoTaskLibrary.Application
     }
     public class AccountRepository : IAccountRepository
     {
-        private readonly SqlDataFactory _sqlDataFactory;
-        public AccountRepository(SqlDataFactory sqlDataFactory)
+        private readonly ISqlDataFactory _sqlDataFactory;
+        public AccountRepository(ISqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

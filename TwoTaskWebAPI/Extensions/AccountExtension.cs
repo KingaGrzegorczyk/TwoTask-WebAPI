@@ -9,9 +9,9 @@ namespace TwoTaskWebAPI.Extensions
 {
     public class AccountExtension
     {
-        private readonly SqlDataFactory _sqlDataFactory;
+        private readonly ISqlDataFactory _sqlDataFactory;
         private readonly JwtSettings _jwtSettings;
-        public AccountExtension(JwtSettings jwtSettings, SqlDataFactory sqlDataFactory)
+        public AccountExtension(JwtSettings jwtSettings, ISqlDataFactory sqlDataFactory)
         {
             _jwtSettings = jwtSettings;
             _sqlDataFactory = sqlDataFactory;

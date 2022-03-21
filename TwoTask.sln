@@ -9,7 +9,7 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "TwoTaskData", "TwoTaskData\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoTaskLibrary", "TwoTaskLibrary\TwoTaskLibrary.csproj", "{4D9581CD-5851-4FCB-814C-E0F094B75CC3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TwoTaskWebAPI.Test", "TwoTaskWebAPI.Test\TwoTaskWebAPI.Test.csproj", "{9825880F-4760-4224-A897-3079863A4F4D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwoTaskWebAPI.UnitTests", "TwoTaskWebAPI.Test\TwoTaskWebAPI.UnitTests.csproj", "{9825880F-4760-4224-A897-3079863A4F4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

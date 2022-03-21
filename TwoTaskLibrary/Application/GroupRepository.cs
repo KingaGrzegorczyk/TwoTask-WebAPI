@@ -25,9 +25,9 @@ namespace TwoTaskLibrary.Application
     }
     public class GroupRepository : IGroupRepository
     {
-        private readonly SqlDataFactory _sqlDataFactory;
+        private readonly ISqlDataFactory _sqlDataFactory;
 
-        public GroupRepository(SqlDataFactory sqlDataFactory)
+        public GroupRepository(ISqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

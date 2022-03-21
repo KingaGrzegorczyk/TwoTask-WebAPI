@@ -21,9 +21,9 @@ namespace TwoTaskLibrary.Application
     }
     public class RegionRepository : IRegionRepository
     {
-        private readonly SqlDataFactory _sqlDataFactory;
+        private readonly ISqlDataFactory _sqlDataFactory;
 
-        public RegionRepository(SqlDataFactory sqlDataFactory)
+        public RegionRepository(ISqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }

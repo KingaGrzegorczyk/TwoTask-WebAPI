@@ -23,9 +23,9 @@ namespace TwoTaskLibrary.Application
     }
     public class TodoTaskRepository : ITodoTaskRepository
     {
-        private readonly SqlDataFactory _sqlDataFactory;
+        private readonly ISqlDataFactory _sqlDataFactory;
 
-        public TodoTaskRepository(SqlDataFactory sqlDataFactory)
+        public TodoTaskRepository(ISqlDataFactory sqlDataFactory)
         {
             _sqlDataFactory = sqlDataFactory;
         }
